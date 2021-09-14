@@ -1,0 +1,31 @@
+/* 项目总样式 */
+html,
+body {
+    width: 100%;
+    height: 100%;
+}
+
+#root {
+    width: 100%;
+    height: 100%;
+}
+
+.body {
+    width: 100%;
+    height: 100%;
+    padding-bottom: 70px;
+}
+@import url(./assets/css/iconfont.css);
+
+@font-face {
+    font-family: 'MyFont1';
+    src: url(./assets/fonts/胡晓波男神体.otf);
+}
+@font-face {
+    font-family: 'MyFont2';
+    src: url(./assets/fonts/宅在家自動筆.ttf);
+}
+@font-face {
+    font-family: 'MyFont3';
+    src: url(./assets/fonts/文道潮黑体.ttf);
+}

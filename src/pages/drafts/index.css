@@ -1,0 +1,33 @@
+.drafts {
+    padding: 0;
+    margin: 0;
+}
+
+.drafts .drafts-group {
+    font-size: 16px;
+    padding: 0 20px;
+}
+
+.drafts .drafts-group.drafts-group-create,
+.drafts .drafts-group.drafts-group-do {
+    margin-top: 1.5em;
+}
+
+.drafts .drafts-group .drafts-group-title {
+    font-size: 2em;
+    font-family: "MyFont2";
+    font-weight: bold;
+    color: #1DA57A;
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.drafts .drafts-group .drafts-group-main {
+    background-color: #fff;
+    padding: 2em;
+}
+
+.drafts .drafts-group .drafts-group-main .drafts-item-list {
+    width: 100%;
+}

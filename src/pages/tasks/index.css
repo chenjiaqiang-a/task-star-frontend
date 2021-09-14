@@ -1,0 +1,41 @@
+.tasks {
+    padding: 0;
+    margin: 0;
+}
+
+.tasks .tasks-group {
+    font-size: 16px;
+    padding: 0 20PX;
+}
+
+.tasks .tasks-group.tasks-group-create,
+.tasks .tasks-group.tasks-group-do {
+    margin-top: 1.5em;
+}
+
+.tasks .tasks-group .tasks-group-title {
+    font-size: 2em;
+    font-family: 'MyFont2';
+    font-weight: bold;
+    color: #1DA57A;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.tasks .tasks-group .tasks-group-title .search {
+    max-width: 200px;
+}
+
+.tasks .tasks-group .tasks-group-main {
+    background-color: #fff;
+    padding: 2em;
+}
+
+.tasks .tasks-group .tasks-group-pagination {
+    margin-top: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
