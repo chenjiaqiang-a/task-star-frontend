@@ -4,7 +4,7 @@ import {
     UserOutlined,
 } from '@ant-design/icons'
 
-import './set.less'
+import './sets.less'
 
 export default class Sets extends Component {
     render() {

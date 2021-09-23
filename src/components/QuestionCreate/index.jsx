@@ -1,6 +1,9 @@
 import React, { Component } from 'react'
 import Editable from '../Editable'
-import {TextInput} from '../FormItems'
+import {
+    TextInput,
+    TextArea,
+} from '../FormItems'
 
 import "./index.less"
 
@@ -11,6 +14,8 @@ export default class QuestionCreate extends Component {
         let formItem
         if (type === "text-input") {
             formItem = <TextInput create {...question} />
+        } else if (type === "text-area") {
+            formItem = <TextArea create {...question} />
         } else {
             formItem = <div>...</div>
         }

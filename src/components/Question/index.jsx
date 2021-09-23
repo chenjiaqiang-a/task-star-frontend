@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 
 import './index.less'
 import {
+    TextArea,
     TextInput
 } from  '../FormItems'
 
@@ -11,7 +12,9 @@ export default class Question extends Component {
         const { type, required } = question
         let formItem
         if (type === "text-input") {
-            formItem = <TextInput {...question} />
+            formItem = <TextInput {...question} handleValueChange={this.props.handleValueChange} />
+        } else if (type === "text-area") {
+            formItem = <TextArea {...question} handleValueChange={this.props.handleValueChange} />
         } else {
             formItem = <div>...</div>
         }

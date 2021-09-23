@@ -25,7 +25,7 @@ class Main extends Component {
         const selectedKeys = [this.props.location.pathname.split("/").pop()]
         return (
             <div className="main">
-                <Header />
+                <Header history={this.props.history} />
                 <div className="main-body body">
                     <Layout style={{minHeight: "calc(100vh - 140px)"}}>
                         <Sider

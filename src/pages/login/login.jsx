@@ -64,7 +64,7 @@ export default class Login extends Component {
 
         return (
             <div className="login">
-                <Header />
+                <Header history={this.props.history} />
                 <div className="content body">
                     <div className="container">
                         <div className="welcome">
