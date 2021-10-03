@@ -3,6 +3,9 @@ import Editable from '../Editable'
 import {
     TextInput,
     TextArea,
+    DateInput,
+    RadioSelect,
+    CheckboxSelect,
 } from '../FormItems'
 
 import "./index.less"
@@ -16,6 +19,12 @@ export default class QuestionCreate extends Component {
             formItem = <TextInput create {...question} />
         } else if (type === "text-area") {
             formItem = <TextArea create {...question} />
+        } else if (type === "date-input") {
+            formItem = <DateInput create {...question} />
+        } else if (type === "radio") {
+            formItem = <RadioSelect create {...question} updateChoice={this.handleChoiceChange} />
+        } else if (type === "checkbox") {
+            formItem = <CheckboxSelect create {...question} updateChoice={this.handleChoiceChange} />
         } else {
             formItem = <div>...</div>
         }
@@ -32,6 +41,11 @@ export default class QuestionCreate extends Component {
     handleTitleEdit = (content) => {
         let {question, order} = this.props
         question.question = content
+        this.props.updateQuestion(order-1, question)
+    }
+    handleChoiceChange = (choices) => {
+        let {question, order} = this.props
+        question.choices = choices
         this.props.updateQuestion(order-1, question)
     }
 }

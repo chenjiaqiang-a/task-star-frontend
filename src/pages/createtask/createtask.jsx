@@ -39,7 +39,7 @@ const questions = [
         task_id: task.id,
         question: "这是一个单行输入框",
         type: "text-input",
-        choices: [],
+        choices: "",
         required: true,
         selected: false
     },
@@ -48,7 +48,7 @@ const questions = [
         task_id: task.id,
         question: "这是一个多行输入框",
         type: "text-area",
-        choices: [],
+        choices: "",
         required: false,
         selected: false
     },
@@ -57,19 +57,28 @@ const questions = [
         task_id: task.id,
         question: "这是一个单项选择",
         type: "radio",
-        choices: ["选项一", "选项二"],
+        choices: "选项一;选项二;[other]其它",
         selected: false,
         required: true,
     },
     {
         id: "4",
         task_id: task.id,
-        question: "这是一个多行输入框",
-        type: "text-area",
-        choices: [],
+        question: "这是一个日期输入框",
+        type: "date-input",
+        choices: "",
         required: false,
         selected: false
-    }
+    },
+    {
+        id: "5",
+        task_id: task.id,
+        question: "这是一个多项选择",
+        type: "checkbox",
+        choices: "选项一;选项二",
+        selected: false,
+        required: true,
+    },
 ]
 
 export default class CreateTask extends Component {
@@ -331,7 +340,7 @@ export default class CreateTask extends Component {
             task_id: task.id,
             question: "这是一个多行输入框",
             type: "text-area",
-            choices: [],
+            choices: "",
             required: true,
             selected: false
         }
@@ -344,8 +353,8 @@ export default class CreateTask extends Component {
             id: nanoid(),
             task_id: task.id,
             question: "这是一个日期选择框",
-            type: "text-date",
-            choices: [],
+            type: "date-input",
+            choices: "",
             required: true,
             selected: false
         }
@@ -359,7 +368,7 @@ export default class CreateTask extends Component {
             task_id: task.id,
             question: "这是一个单项选择",
             type: "radio",
-            choices: ["选项一", "选项二"],
+            choices: "选项一;选项二",
             required: true,
             selected: false
         }
@@ -373,7 +382,7 @@ export default class CreateTask extends Component {
             task_id: task.id,
             question: "这是一个多项选择",
             type: "checkbox",
-            choices: [],
+            choices: "选项一;选项二",
             required: true,
             selected: false
         }
@@ -387,7 +396,7 @@ export default class CreateTask extends Component {
             task_id: task.id,
             question: "这是一个图片上传",
             type: "image-uploader",
-            choices: [],
+            choices: "",
             required: true,
             selected: false
         }
@@ -401,7 +410,7 @@ export default class CreateTask extends Component {
             task_id: task.id,
             question: "这是一个文件上传",
             type: "file-uploader",
-            choices: [],
+            choices: "",
             required: true,
             selected: false
         }

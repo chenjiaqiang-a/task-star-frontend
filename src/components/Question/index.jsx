@@ -2,6 +2,9 @@ import React, { Component } from 'react'
 
 import './index.less'
 import {
+    CheckboxSelect,
+    DateInput,
+    RadioSelect,
     TextArea,
     TextInput
 } from  '../FormItems'
@@ -15,6 +18,12 @@ export default class Question extends Component {
             formItem = <TextInput {...question} handleValueChange={this.props.handleValueChange} />
         } else if (type === "text-area") {
             formItem = <TextArea {...question} handleValueChange={this.props.handleValueChange} />
+        } else if (type === "date-input") {
+            formItem = <DateInput {...question} handleValueChange={this.props.handleValueChange} />
+        } else if (type === "radio") {
+            formItem = <RadioSelect {...question} handleChooseChange={this.props.handleChooseChange} handleChoiceChange={this.props.handleChoiceChange} />
+        } else if (type === "checkbox") {
+            formItem = <CheckboxSelect {...question} handleChooseChange={this.props.handleChooseChange} handleChoiceChange={this.props.handleChoiceChange} />
         } else {
             formItem = <div>...</div>
         }

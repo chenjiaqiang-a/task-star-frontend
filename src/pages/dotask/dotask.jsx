@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import {
+    Button,
     Divider,
 } from 'antd'
 
@@ -34,6 +35,47 @@ const testTask = {
             choices: [],
             choose: [],
             required: false,
+        },
+        {
+            id: 3,
+            order: 3,
+            task_id: "11111",
+            question: "这是一个日期输入框",
+            type: "date-input",
+            value: "",
+            choices: [],
+            choose: [],
+            required: false,
+        },
+        {
+            id: 4,
+            order: 4,
+            task_id: "11111",
+            question: "这是一个单项选择",
+            type: "radio",
+            value: "",
+            choices: [
+                {id: 1, question_id: 4, text: "选项一", other: false}, 
+                {id: 2, question_id: 4, text: "选项二", other: false}, 
+                {id: 3, question_id: 4, text: "其它", other: true, value: ""}
+            ],
+            choose: [],
+            required: true,
+        },
+        {
+            id: 5,
+            order: 5,
+            task_id: "11111",
+            question: "这是一个单项选择",
+            type: "checkbox",
+            value: "",
+            choices: [
+                {id: '1', question_id: 4, text: "选项一", other: false}, 
+                {id: '2', question_id: 4, text: "选项二", other: false}, 
+                {id: '3', question_id: 4, text: "其它", other: true, value: ""}
+            ],
+            choose: [],
+            required: true,
         }
     ]
 }
@@ -56,9 +98,19 @@ export default class DoTask extends Component {
                         </div>
                         <Divider />
                         <div className="question-list">
-                            {questions.map(
-                                (question, idx) => <Question key={question.id} order={idx+1} question={question} handleValueChange={this.handleValueChange(idx)}/>
-                            )}
+                            {questions.map((question, idx) => (
+                                <Question 
+                                    key={question.id}
+                                    order={idx+1}
+                                    question={question}
+                                    handleValueChange={this.handleValueChange(idx)}
+                                    handleChoiceChange={this.handleChoiceChange(idx)}
+                                    handleChooseChange={this.handleChooseChange(idx)}
+                                />
+                            ))}
+                        </div>
+                        <div className="submit-btn">
+                            <Button type="primary" style={{height: "100%"}} size="large">完成提交</Button>
                         </div>
                     </div>
                 </div>
@@ -70,6 +122,20 @@ export default class DoTask extends Component {
         return (value) => {
             let { questions } = this.state
             questions[idx].value = value
+            this.setState({questions})
+        }
+    }
+    handleChoiceChange = (idx) => {
+        return (choices) => {
+            let { questions } = this.state
+            questions[idx].choices = choices
+            this.setState({questions})
+        }
+    }
+    handleChooseChange = (idx) => {
+        return (choose) => {
+            let { questions } = this.state
+            questions[idx].choose = choose
             this.setState({questions})
         }
     }
