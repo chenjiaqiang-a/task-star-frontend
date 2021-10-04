@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
-import {Card,Avatar} from 'antd';
+import {Card,Avatar, Button, Tooltip, Space} from 'antd';
 import {
-    PlusOutlined
+    PlusOutlined, UpCircleOutlined,ShareAltOutlined,PieChartOutlined
 } from '@ant-design/icons'
 import blockImg from '../../assets/images/block.jpg'
 
@@ -15,7 +15,27 @@ export default class DisplayBlock extends Component {
             <Card
                 hoverable
                 className="display-block"
-                cover={<img alt="example" src={blockImg} />}
+                cover={
+                    <div className="block-img">
+                        <img alt="example" src={blockImg} />
+                        <div className="block-btn">
+                            <div className="publish">未发布</div>
+                            <div className="btn-group">
+                                <Space direction="vertical">
+                                    <Tooltip title="发布">
+                                        <Button icon={<UpCircleOutlined/>}/>
+                                    </Tooltip>
+                                    <Tooltip title="分享任务">
+                                        <Button icon={<ShareAltOutlined />}/>
+                                    </Tooltip>
+                                    <Tooltip title="数据分析">
+                                        <Button icon={<PieChartOutlined />}/>
+                                    </Tooltip> 
+                                </Space>
+                            </div>
+                        </div>
+                    </div>
+                }
             >
                 <Meta title="/任务名称/" description="/任务描述/" />
             </Card>

@@ -25,7 +25,7 @@ export default class Home extends Component {
                             <Button type="link">换一批</Button>
                         </div>
                         <div className="cards">
-                            <Row gutter={[16, 16]}>
+                            <Row style={{width:"100%", minWidth:1200}} gutter={[16, 16]}>
                                 <Col span={8}><Card history={this.props.history} /></Col>
                                 <Col span={8}><Card history={this.props.history} /></Col>
                                 <Col span={8}><Card history={this.props.history} /></Col>
