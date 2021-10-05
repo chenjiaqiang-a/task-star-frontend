@@ -107,6 +107,11 @@ export default class Header extends Component {
     }
     handleSearch = (event) => {
         event.preventDefault()
-        this.props.history.push("/search")
+        const {searchText} = this.state
+        if (searchText.trim()){
+            this.props.history.push(`/search/?kw=${searchText.trim()}`)
+        } else {
+            return;
+        }
     }
 }
