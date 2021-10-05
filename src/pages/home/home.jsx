@@ -12,7 +12,7 @@ export default class Home extends Component {
     render() {
         return (
             <div className="home">
-                <Header />
+                <Header history={this.props.history} />
                 <div className="body">
                     <div className="home-jumbotron">
                         <h1>任务星球</h1>

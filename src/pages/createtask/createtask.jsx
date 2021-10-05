@@ -14,7 +14,6 @@ import {
 } from 'antd'
 import {
     DeleteOutlined,
-    DownloadOutlined,
 } from '@ant-design/icons'
 import { 
     DragDropContext, 
@@ -32,44 +31,54 @@ import QuestionCreate from '../../components/QuestionCreate'
 const task = {
     title: "任务名称",
     description: "任务描述",
+    id: nanoid(),
 }
 const questions = [
     {
         id: "1",
-        task_id: "11111",
+        task_id: task.id,
         question: "这是一个单行输入框",
         type: "text-input",
-        choices: [],
+        choices: "",
         required: true,
         selected: false
     },
     {
         id: "2",
-        task_id: "11111",
+        task_id: task.id,
         question: "这是一个多行输入框",
         type: "text-area",
-        choices: [],
+        choices: "",
         required: false,
         selected: false
     },
     {
         id: "3",
-        task_id: "11111",
-        question: "这是一个单行输入框",
-        type: "text-input",
-        choices: [],
+        task_id: task.id,
+        question: "这是一个单项选择",
+        type: "radio",
+        choices: "选项一;选项二;[other]其它",
         selected: false,
         required: true,
     },
     {
         id: "4",
-        task_id: "11111",
-        question: "这是一个多行输入框",
-        type: "text-area",
-        choices: [],
+        task_id: task.id,
+        question: "这是一个日期输入框",
+        type: "date-input",
+        choices: "",
         required: false,
         selected: false
-    }
+    },
+    {
+        id: "5",
+        task_id: task.id,
+        question: "这是一个多项选择",
+        type: "checkbox",
+        choices: "选项一;选项二",
+        selected: false,
+        required: true,
+    },
 ]
 
 export default class CreateTask extends Component {
@@ -93,7 +102,7 @@ export default class CreateTask extends Component {
         )
         return (
             <div className="create-task">
-                <Header/>
+                <Header history={this.props.history} />
                 <div className="create-task-body body">
                     <div className="left-operating-area">
                         <Divider orientation="left">批量操作</Divider>
@@ -113,7 +122,7 @@ export default class CreateTask extends Component {
                             <Button>添加一页</Button>
                             <Button>合并所有页</Button>
                         </Space>
-                        
+                        <Button onClick={this.handleSaveTask} style={{marginTop:50}} type="primary" >保存任务</Button>
                     </div>
                     
                     <div className="create-platform">
@@ -185,20 +194,40 @@ export default class CreateTask extends Component {
                             </Col>
                             <Col span={8}>
                                 <Tooltip title="多行文本输入框">
-                                    <Button type="primary" icon={<span className="iconfont icon-wenbenkuang" />} size='large' />
+                                    <Button type="primary" onClick={this.addTextArea} icon={<span className="iconfont icon-wenbenkuang" />} size='large' />
+                                </Tooltip>
+                            </Col>
+                            <Col span={8}>
+                                <Tooltip title="日期选择框">
+                                    <Button type="primary" onClick={this.addDateInput} icon={<span className="iconfont icon-riqi" />} size='large' />
                                 </Tooltip>
                             </Col>
                         </Row>
                         <Divider orientation="right">选择组件</Divider>
                         <Row gutter={[8, 8]}>
-                            <Col span={8}><Button type="primary" icon={<DownloadOutlined />} size={'large'} /></Col>
-                            <Col span={8}><Button type="primary" icon={<DownloadOutlined />} size={'large'} /></Col>
-                            <Col span={8}><Button type="primary" icon={<DownloadOutlined />} size={'large'} /></Col>
+                            <Col span={8}>
+                                <Tooltip title="单项选择">
+                                    <Button type="primary" onClick={this.addRadio} icon={<span className="iconfont icon-danxuan" />} size='large' />
+                                </Tooltip>
+                            </Col>
+                            <Col span={8}>
+                                <Tooltip title="多项选择">
+                                    <Button type="primary" onClick={this.addCheckbox} icon={<span className="iconfont icon-checkBox" />} size='large' />
+                                </Tooltip>
+                            </Col>
                         </Row>
                         <Divider orientation="right">文件组件</Divider>
                         <Row gutter={[8, 8]}>
-                            <Col span={8}><Button type="primary" icon={<DownloadOutlined />} size={'large'} /></Col>
-                            <Col span={8}><Button type="primary" icon={<DownloadOutlined />} size={'large'} /></Col>
+                            <Col span={8}>
+                                <Tooltip title="图片上传">
+                                    <Button type="primary" onClick={this.addImageUploader} icon={<span className="iconfont icon-tupian" />} size='large' />
+                                </Tooltip>
+                            </Col>
+                            <Col span={8}>
+                                <Tooltip title="文件上传">
+                                    <Button type="primary" onClick={this.addFileUploader} icon={<span className="iconfont icon-wenjian" />} size='large' />
+                                </Tooltip>
+                            </Col>
                         </Row>
                     </div>
                 </div>
@@ -285,16 +314,103 @@ export default class CreateTask extends Component {
     handleCancel = () => {
         this.setState({visible: false})
     }
+    handleSaveTask = () => {
+        this.props.history.replace("/main/tasks")
+    }
 
     // 表单插入函数
     addInput = () => { 
-        let {questions} = this.state
+        let {task, questions} = this.state
         let newQuestion = {
             id: nanoid(),
-            task_id: "11111",
+            task_id: task.id,
             question: "这是一个单行输入框",
             type: "text-input",
             choices: [],
+            required: true,
+            selected: false
+        }
+        questions.push(newQuestion)
+        this.setState({questions})
+    }
+    addTextArea = () => {
+        let {task, questions} = this.state
+        let newQuestion = {
+            id: nanoid(),
+            task_id: task.id,
+            question: "这是一个多行输入框",
+            type: "text-area",
+            choices: "",
+            required: true,
+            selected: false
+        }
+        questions.push(newQuestion)
+        this.setState({questions})
+    }
+    addDateInput = () => {
+        let {task, questions} = this.state
+        let newQuestion = {
+            id: nanoid(),
+            task_id: task.id,
+            question: "这是一个日期选择框",
+            type: "date-input",
+            choices: "",
+            required: true,
+            selected: false
+        }
+        questions.push(newQuestion)
+        this.setState({questions})
+    }
+    addRadio = () => {
+        let {task, questions} = this.state
+        let newQuestion = {
+            id: nanoid(),
+            task_id: task.id,
+            question: "这是一个单项选择",
+            type: "radio",
+            choices: "选项一;选项二",
+            required: true,
+            selected: false
+        }
+        questions.push(newQuestion)
+        this.setState({questions})
+    }
+    addCheckbox = () => {
+        let {task, questions} = this.state
+        let newQuestion = {
+            id: nanoid(),
+            task_id: task.id,
+            question: "这是一个多项选择",
+            type: "checkbox",
+            choices: "选项一;选项二",
+            required: true,
+            selected: false
+        }
+        questions.push(newQuestion)
+        this.setState({questions})
+    }
+    addImageUploader = () => {
+        let {task, questions} = this.state
+        let newQuestion = {
+            id: nanoid(),
+            task_id: task.id,
+            question: "这是一个图片上传",
+            type: "image-uploader",
+            choices: "",
+            required: true,
+            selected: false
+        }
+        questions.push(newQuestion)
+        this.setState({questions})
+    }
+    addFileUploader = () => {
+        let {task, questions} = this.state
+        let newQuestion = {
+            id: nanoid(),
+            task_id: task.id,
+            question: "这是一个文件上传",
+            type: "file-uploader",
+            choices: "",
             required: true,
             selected: false
         }

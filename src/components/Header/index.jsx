@@ -15,9 +15,10 @@ export default class Header extends Component {
         // isSignIn: false
         visible: false,
         confirmLoading: false,
+        searchText: "",
     }
     render() {
-        const {visible, confirmLoading} = this.state
+        const {visible, confirmLoading, searchText} = this.state
         const isSignedIn = memoryUtils.isSignedIn
         const model = (
             <Modal
@@ -57,8 +58,8 @@ export default class Header extends Component {
                     <h1>任务星球</h1>
                 </Link>
                 <div className="search-bar">
-                    <form action="#">
-                        <input type="text" placeholder="请输入您要搜索的任务..." />
+                    <form onSubmit={this.handleSearch}>
+                        <input type="text" value={searchText} onChange={this.handleSearchTextChange} placeholder="请输入您要搜索的任务..." />
                         <button type="submit"><SearchOutlined /></button>
                     </form>
                 </div>
@@ -99,5 +100,18 @@ export default class Header extends Component {
         storageUtils.removeIsSignedIn()
         this.setState({confirmLoading:false, visible: false})
     }
-    
+    handleSearchTextChange = (event) => {
+        this.setState({
+            searchText: event.target.value,
+        })
+    }
+    handleSearch = (event) => {
+        event.preventDefault()
+        const {searchText} = this.state
+        if (searchText.trim()){
+            this.props.history.push(`/search/?kw=${searchText.trim()}`)
+        } else {
+            return;
+        }
+    }
 }
