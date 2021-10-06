@@ -20,7 +20,7 @@ memoryUtils.isSignedIn = storageUtils.getIsSignedIn()
 
 const emptyRender = () => (
     <Empty 
-        image={<img src={noResult} />}
+        image={<img src={noResult} alt="暂无数据" />}
         description="未搜索到任务"
     />
 )

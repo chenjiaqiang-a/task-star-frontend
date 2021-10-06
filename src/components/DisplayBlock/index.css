@@ -14,13 +14,14 @@
     display: flex;
 }
 .display-block .block-img .block-btn .btn-group {
+    padding-top: 40px;
     margin-left: auto;
 }
 .display-block .block-img .block-btn .publish {
     font-size: 20px;
     font-weight: 700;
     font-family: "MyFont1";
-    color: rgba(57, 84, 236, 0.8);
+    color: #14cebe;
 }
 
 .display-block.add-block {

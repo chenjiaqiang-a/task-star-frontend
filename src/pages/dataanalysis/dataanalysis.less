@@ -1,0 +1,33 @@
+.data-analysis {
+    padding: 0 20px;
+    margin-top: 20px;
+    .ant-tabs-card {
+        .ant-tabs-tab {
+            width: 150px;
+            background: transparent;
+            border-color: transparent;
+        }
+        .ant-tabs-tab-active {
+            background: #fff;
+            border-color: #fff;
+        }
+        .ant-tabs-content {
+            margin-top: -16px;
+            .ant-tabs-tabpane {
+                padding: 16px;
+                background-color: #fff;
+                .data-display {
+                    min-height: calc(100vh - 240px);
+                    .ant-list-items {
+                        max-height: 600px;
+                        overflow-y: auto;
+                        border: 1px solid #efefef;
+                        border-radius: 5px;
+                        padding: 0 8px;
+                        margin-top: 5px;
+                    }
+                }
+            }
+        }
+    }
+}

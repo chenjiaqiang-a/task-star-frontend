@@ -31,6 +31,8 @@ import QuestionCreate from '../../components/QuestionCreate'
 const task = {
     title: "任务名称",
     description: "任务描述",
+    private: false,
+    manySubmit: false,
     id: nanoid(),
 }
 const questions = [
@@ -117,12 +119,17 @@ export default class CreateTask extends Component {
                             <Button>优先级</Button>
                             <Button>取消表单项关系</Button>
                         </Space>
-                        <Divider orientation="left">分页操作</Divider>
+                        <Divider orientation="left">任务属性</Divider>
                         <Space style={{ width: "100%" }} direction="vertical">
-                            <Button>添加一页</Button>
-                            <Button>合并所有页</Button>
+                            <Checkbox onChange={this.handleCheckPublic} checked={!task.private}>公开任务</Checkbox>
+                            <Checkbox onChange={this.handleManySubmit} checked={task.manySubmit}>允许多次提交</Checkbox>
                         </Space>
-                        <Button onClick={this.handleSaveTask} style={{marginTop:50}} type="primary" >保存任务</Button>
+                        <Divider/>
+                        <Space>
+                            <Button onClick={this.handleSaveToDraft} >存入草稿</Button>
+                            <Button onClick={this.handleSaveTask} type="primary" >保存任务</Button>
+
+                        </Space>
                     </div>
                     
                     <div className="create-platform">
@@ -316,6 +323,18 @@ export default class CreateTask extends Component {
     }
     handleSaveTask = () => {
         this.props.history.replace("/main/tasks")
+    }
+    handleCheckPublic = (e) => {
+        let { task } = this.state
+        task.private = !e.target.checked
+        this.setState({task})
+    }
+    handleManySubmit = (e) => {
+        let {task} = this.state
+        task.manySubmit = e.target.value
+    }
+    handleSaveToDraft = () => {
+        
     }
 
     // 表单插入函数

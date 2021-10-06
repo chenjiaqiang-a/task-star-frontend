@@ -17,15 +17,30 @@ export default class Tasks extends Component {
 
     state = {
         createSearchText: "",
-        createNum: 9,
         createPage: 1,
         createPageSize: 3,
-        createdTasksList: [{id: "1"},{id: "2"},{id: "3"},],
+        createdTasksList: [
+            {id: "1", title: "任务1", desc: "任务描述", private: false, published: true},
+            {id: "2", title: "任务2", desc: "任务描述", private: true, published: false},
+            {id: "3", title: "任务3", desc: "任务描述", private: false, published: false},
+            {id: "4", title: "任务4", desc: "任务描述", private: false, published: true},
+            {id: "5", title: "任务5", desc: "任务描述", private: false, published: true}
+        ],
         doSearchText: "",
-        doNum: 9,
         doPage: 1,
         doPageSize: 4,
-        doneTasksList: [{id: "1"},{id: "2"},{id: "3"},{id: "4"},],
+        doneTasksList: [
+            {id: "1", title: "任务1", desc: "任务描述", private: false},
+            {id: "2", title: "任务2", desc: "任务描述", private: false},
+            {id: "3", title: "任务3", desc: "任务描述", private: false},
+            {id: "4", title: "任务4", desc: "任务描述", private: false},
+            {id: "5", title: "任务5", desc: "任务描述", private: false},
+            {id: "6", title: "任务6", desc: "任务描述", private: false},
+            {id: "7", title: "任务7", desc: "任务描述", private: false},
+            {id: "8", title: "任务8", desc: "任务描述", private: false},
+            {id: "9", title: "任务9", desc: "任务描述", private: false},
+            {id: "10", title: "任务10", desc: "任务描述", private: false}
+        ],
     }
 
     onCreateSearchChange = (e) => {
@@ -54,8 +69,18 @@ export default class Tasks extends Component {
 
 
     render() {
-        const {createSearchText, createNum, createPage, createPageSize, createdTasksList} = this.state
-        const {doSearchText, doNum, doPage, doPageSize, doneTasksList} = this.state
+        let {createSearchText, createPage, createPageSize, createdTasksList} = this.state
+        let {doSearchText, doPage, doPageSize, doneTasksList} = this.state
+        const createNum = createdTasksList.length
+        const doNum =  doneTasksList.length
+        createdTasksList = createdTasksList.slice(
+            (createPage-1)*createPageSize,
+            (createPage*createPageSize > createNum? createNum:createPage*createPageSize)
+        )
+        doneTasksList = doneTasksList.slice(
+            (doPage-1)*doPageSize,
+            (doPage*doPageSize > doNum? doNum:doPage*doPageSize)
+        )
         return (
             <div className="tasks">
                 <div className="tasks-group tasks-group-create">
@@ -78,10 +103,8 @@ export default class Tasks extends Component {
                                 </Link>
                             </Col>
                             {createdTasksList.map(task => (
-                                <Col key={task.id} xs={12} lg={6}>
-                                    <Link to="/create">
-                                        <DisplayBlock />
-                                    </Link>
+                                <Col onClick={this.displayTask(task.id, true)} key={task.id} xs={12} lg={6}>
+                                    <DisplayBlock history={this.props.history} create task={task} />
                                 </Col>
                             ))}
                         </Row>
@@ -109,10 +132,8 @@ export default class Tasks extends Component {
                     <div className="tasks-group-main">
                         <Row gutter={[16, 16]}>
                             {doneTasksList.map(task => (
-                                <Col key={task.id} xs={12} lg={6}>
-                                    <Link to="/do">
-                                        <DisplayBlock />
-                                    </Link>
+                                <Col onClick={this.displayTask(task.id)} key={task.id} xs={12} lg={6}>
+                                    <DisplayBlock task={task} />
                                 </Col>
                             ))}
                         </Row>
@@ -127,5 +148,10 @@ export default class Tasks extends Component {
                 </div>
             </div>
         );
+    }
+    displayTask = (taskId, create=false) => {
+        return () => {
+            console.log(taskId, create);
+        }
     }
 }
