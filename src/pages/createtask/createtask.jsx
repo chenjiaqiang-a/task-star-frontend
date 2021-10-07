@@ -331,7 +331,8 @@ export default class CreateTask extends Component {
     }
     handleManySubmit = (e) => {
         let {task} = this.state
-        task.manySubmit = e.target.value
+        task.manySubmit = e.target.checked
+        this.setState({task})
     }
     handleSaveToDraft = () => {
         

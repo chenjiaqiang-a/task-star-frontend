@@ -110,6 +110,7 @@ export default class DoTask extends Component {
                             ))}
                         </div>
                         <div className="submit-btn">
+                            <Button style={{height: "100%", marginRight: 15}} size="large">存入草稿</Button>
                             <Button type="primary" style={{height: "100%"}} size="large">完成提交</Button>
                         </div>
                     </div>

@@ -104,6 +104,24 @@ export class RadioCreate extends Component {
         this.props.updateChoice(choices)
     }
 }
+export function RadioDisplay(props) {
+    const { choices, choose } = props
+    return (
+        <Radio.Group value={choose[0]?choose[0]:""}>
+            <Space direction="vertical">
+                {choices.map(choice => (
+                    <Radio key={choice.id} value={choice.id}>
+                        {choice.text}
+                        {choice.other && choose[0] === choice.id ? 
+                            <Input value={choice.value} />
+                        :""}
+                    </Radio>
+                ))}
+            </Space>
+        </Radio.Group>
+    )
+}
+
 
 export class CheckboxDo extends Component {
     render() {
@@ -205,3 +223,21 @@ export class CheckboxCreate extends Component {
         this.props.updateChoice(choices)
     }
 }
+export function CheckboxDisplay(props) {
+    let { choices, choose } = props
+    return (
+        <Checkbox.Group value={choose}>
+            <Space direction="vertical">
+                {choices.map((choice, idx) => (
+                    <Checkbox key={choice.id} value={choice.id}>
+                        {choice.text}
+                        {choice.other && choose.includes(choice.id) ?
+                            <Input style={{marginLeft: 25, marginTop: 10}} value={choice.value} />
+                        : ""}
+                    </Checkbox>
+                ))}
+            </Space>
+        </Checkbox.Group>
+    )
+}
+

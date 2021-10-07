@@ -19,6 +19,12 @@ export class TextInputCreate extends Component {
         );
     }
 }
+export function TextInputDisplay(props) {
+    return (
+        <Input value={props.value} />
+    )
+}
+
 
 const {TextArea} = Input
 export class TextAreaDo extends Component {
@@ -38,6 +44,12 @@ export class TextAreaCreate extends Component {
         )
     }
 }
+export function TextAreaDisplay(props) {
+    return (
+        <TextArea rows={6} onChange={(e) => ()=>{return}} value={props.value}/>
+    )
+}
+
 
 export class DateInputDo extends Component {
     render() {
@@ -60,3 +72,13 @@ export class DateInputCreate extends Component {
         )
     }
 }
+export function DateInputDisplay(props) {
+    let date = moment()
+    if (props.value) {
+        date = moment(props.value, "YYYY-MM-DD")
+    }
+    return (
+        <DatePicker value={date} disabled/>
+    )
+}
+
