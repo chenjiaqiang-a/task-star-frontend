@@ -82,10 +82,11 @@ const questions = [
 export default class QuestionDataDisplay extends Component {
     state = {
         questions: questions,
-        nameFilter: ""
+        nameFilter: "",
+        showQuestionIdx: 0,
     }
     render() {
-        let { questions, nameFilter } = this.state
+        let { questions, nameFilter, showQuestionIdx } = this.state
         questions = questions.filter(question => (question.question.indexOf(nameFilter) !== -1))
         return (
             <div className="data-display">
@@ -107,7 +108,7 @@ export default class QuestionDataDisplay extends Component {
                                 renderItem={(item, idx) => (
                                     <List.Item key={item.id}>
                                         <List.Item.Meta
-                                            title={<Button type="link">{idx+1}、{item.question}</Button>}
+                                            title={<Button type="link" onClick={this.handleChangeQuestion(idx)}>{idx+1}、{item.question}</Button>}
                                             description={item.required? "必填项" : "非必填"}
                                         />
                                     </List.Item>
@@ -119,7 +120,7 @@ export default class QuestionDataDisplay extends Component {
                         <Row gutter={[16]} style={{ height: 200, display: "flex", alignItems: "center" }}>
                             <Col span={24}>
                                 <div style={{fontSize: 30, fontWeight: "bold"}}>问题描述</div>
-                                <QuestionDisplay question={questions[0]} order={1} />
+                                <QuestionDisplay question={questions[showQuestionIdx]} order={showQuestionIdx+1} />
                             </Col>
                         </Row>
                     </Col>
@@ -131,5 +132,10 @@ export default class QuestionDataDisplay extends Component {
         this.setState({
             authorFilter: e.target.value
         })
+    }
+    handleChangeQuestion = (idx) => {
+        return () => {
+            this.setState({showQuestionIdx: idx})
+        }
     }
 }

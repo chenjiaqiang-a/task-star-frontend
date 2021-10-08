@@ -12,10 +12,14 @@ import {
 
 import DisplayBlock, {AddBlock} from '../../components/DisplayBlock'
 import './index.css'
+import TaskDrawer from '../../components/TaskDrawer';
 
 export default class Tasks extends Component {
 
     state = {
+        visible: false,
+        create: false,
+        showTaskId: "",
         createSearchText: "",
         createPage: 1,
         createPageSize: 3,
@@ -69,6 +73,7 @@ export default class Tasks extends Component {
 
 
     render() {
+        const {visible, create, showTaskId} = this.state
         let {createSearchText, createPage, createPageSize, createdTasksList} = this.state
         let {doSearchText, doPage, doPageSize, doneTasksList} = this.state
         const createNum = createdTasksList.length
@@ -146,12 +151,20 @@ export default class Tasks extends Component {
                         />
                     </div>
                 </div>
+                <TaskDrawer visible={visible} create={create} taskId={showTaskId} onClose={this.onClose} />
             </div>
         );
     }
     displayTask = (taskId, create=false) => {
         return () => {
-            console.log(taskId, create);
+            this.setState({
+                visible: true,
+                ShowTaskId: taskId,
+                create: create
+            })
         }
+    }
+    onClose = () => {
+        this.setState({visible: false})
     }
 }

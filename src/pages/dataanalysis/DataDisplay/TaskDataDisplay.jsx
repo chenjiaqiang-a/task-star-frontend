@@ -14,6 +14,7 @@ import {
     ArrowUpOutlined,
 } from '@ant-design/icons';
 
+import TaskDrawer from '../../../components/TaskDrawer'
 import './index.less'
 
 const answers = [
@@ -63,9 +64,11 @@ export default class TaskDataDisplay extends Component {
     state = {
         authorFilter: "",
         answers: answers,
+        showTaskId: "",
+        visible: false,
     }
     render() {
-        let { answers, authorFilter } = this.state
+        let { showTaskId, visible, answers, authorFilter } = this.state
         let ansNum = answers.length
         answers = answers.filter(item => (item.author.name.indexOf(authorFilter) !== -1))
 
@@ -90,7 +93,7 @@ export default class TaskDataDisplay extends Component {
                                     <List.Item key={item.id}>
                                         <List.Item.Meta
                                             avatar={item.author.avatar ? <Avatar src={item.author.avatar} /> : <Avatar icon={<UserOutlined />} />}
-                                            title={<Button type="link">{item.author.name}</Button>}
+                                            title={<Button type="link" onClick={this.handleShowAnswer(item.id)}>{item.author.name}</Button>}
                                             description={item.submitTime}
                                         />
                                     </List.Item>
@@ -118,6 +121,7 @@ export default class TaskDataDisplay extends Component {
                         </Row>
                     </Col>
                 </Row>
+                <TaskDrawer visible={visible} taskId={showTaskId} onClose={this.handleClose} />
             </div>
         )
     }
@@ -126,5 +130,16 @@ export default class TaskDataDisplay extends Component {
         this.setState({
             authorFilter: e.target.value
         })
+    }
+    handleShowAnswer =(taskId) => {
+        return () => {
+            this.setState({
+                visible: true,
+                showTaskId: taskId
+            })
+        }
+    }
+    handleClose = () => {
+        this.setState({visible: false})
     }
 }
