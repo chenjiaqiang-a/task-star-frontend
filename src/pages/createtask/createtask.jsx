@@ -416,7 +416,7 @@ export default class CreateTask extends Component {
             task_id: task.id,
             question: "这是一个图片上传",
             type: "image-uploader",
-            choices: "",
+            choices: "1",
             required: true,
             selected: false
         }

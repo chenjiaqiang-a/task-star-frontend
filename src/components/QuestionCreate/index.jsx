@@ -6,6 +6,8 @@ import {
     DateInput,
     RadioSelect,
     CheckboxSelect,
+    ImageUploader,
+    FileUploader,
 } from '../FormItems'
 
 import "./index.less"
@@ -25,6 +27,10 @@ export default class QuestionCreate extends Component {
             formItem = <RadioSelect create {...question} updateChoice={this.handleChoiceChange} />
         } else if (type === "checkbox") {
             formItem = <CheckboxSelect create {...question} updateChoice={this.handleChoiceChange} />
+        } else if (type === "image-uploader") {
+            formItem = <ImageUploader create {...question} updateChoice={this.handleChoiceChange}/>
+        } else if (type === "file-uploader") {
+            formItem = <FileUploader create {...question}/>
         } else {
             formItem = <div>...</div>
         }

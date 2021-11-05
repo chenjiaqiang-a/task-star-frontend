@@ -172,24 +172,29 @@ export default class Login extends Component {
             this.setState({isSubmitting:false})
             return
         }
-        try {
-            const result = await api.reqLogin(signInUsername, signInPassword)
-            if (result.data.status === 0) {
-                const {username, email, nickname} = result.data.userInfo
-                const userInfo = {username, email, nickname, rememberInfo}
-                storageUtils.saveIsSignedIn(true)
-                storageUtils.saveUserInfo(userInfo)
-                memoryUtils.userInfo = userInfo
-                memoryUtils.isSignedIn = true
-                this.props.history.replace("/home")
-                return
-            } else {
-                message.error(result.data.msg)
-                this.setState({signInPassword: ""})
-            }
-        } catch (err) {
-            console.log(err);
+        
+        // 登录操作
+        const result = await api.reqLogin(signInUsername, signInPassword)
+        if (result) {
+            // 登录成功
+            const {user_name, userId, phone, token, nickname, email} = result
+            const userInfo = {username: user_name, userId, phone, rememberInfo, nickname, email}
+            storageUtils.saveIsSignedIn(true)
+            storageUtils.saveUserInfo(userInfo)
+            storageUtils.saveToken(token)
+            memoryUtils.userInfo = userInfo
+            memoryUtils.isSignedIn = true
+            memoryUtils.token = token
+            this.setState({isSubmitting:false})
+            message.success("登录成功！")
+            this.props.history.replace("/home")
+            return
+        } else {
+            // 登陆失败
+            message.error("用户名或密码错误！")
+            this.setState({signInPassword: ""})
         }
+
         this.setState({isSubmitting:false})
     }
     // 是否记住信息
@@ -236,25 +241,29 @@ export default class Login extends Component {
         }
         const userInfo = {
             username: signUpUsername,
-            password: signUpPassword,
-            email: email,
-            nickname: signUpUsername,
+            pass: signUpPassword,
+            // email: email,
+            // nickname: signUpUsername,
         }
-        try {
-            const result = await api.reqRegister(userInfo)
-            if (result.data.id) {
-                message.success("注册成功！")
-                this.setState({
-                    signInMode: true,
-                    signInPassword: signUpPassword,
-                    signInUsername: signUpUsername
-                })
-            } else {
-                message.error(result.data.msg)
-            }
-        } catch (err) {
-            console.log(err);
+        
+        const result = await api.reqRegister(userInfo)
+        if (result) {
+            message.success("注册成功！")
+            this.setState({
+                signInMode: true,
+                signInPassword: signUpPassword,
+                signInUsername: signUpUsername
+            })
+        } else {
+            message.error("该用户已被注册，请更换用户名")
+            this.setState({
+                signUpUsername:"",
+                signUpPassword:"",
+                email:"",
+                repeatPassword:""
+            })
         }
+
         this.setState({isSubmitting:false})
     }
 

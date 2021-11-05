@@ -14,11 +14,11 @@ export default class App extends Component {
             <Switch>
                 <Route path="/home" component={Home} exact />
                 <Route path="/login" component={Login} exact />
-                <Route path="/dotask" component={DoTask} />
+                <Route path="/dotask/:id" component={DoTask} />
                 <Route path="/main" component={Main} />
                 <Route path="/search" component={Search} />
                 <Route path="/createtask" component={CreateTask} />
-                <Redirect to="/createtask" />
+                <Redirect to="/home" />
             </Switch>
         )
     }

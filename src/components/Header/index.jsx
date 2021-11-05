@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { Link } from 'react-router-dom'
-import { SearchOutlined, UserOutlined } from '@ant-design/icons'
+import { FileTextOutlined, HomeOutlined, SearchOutlined, SettingOutlined, UserOutlined } from '@ant-design/icons'
 import {
     Avatar, Button, Dropdown, Menu, Modal, Tooltip,
 } from 'antd'
@@ -9,6 +9,7 @@ import logo from '../../assets/images/logo.png'
 import './index.less'
 import memoryUtils from '../../utils/memoryUtils'
 import storageUtils from '../../utils/storageUtils'
+import { Divider } from 'rc-menu'
 
 export default class Header extends Component {
     state = {
@@ -20,6 +21,7 @@ export default class Header extends Component {
     render() {
         const {visible, confirmLoading, searchText} = this.state
         const isSignedIn = memoryUtils.isSignedIn
+        const userInfo = memoryUtils.userInfo
         const model = (
             <Modal
             title="登出确认"
@@ -37,12 +39,20 @@ export default class Header extends Component {
             mode="vertical"
             theme="dark"
             >
-                <Menu.Item icon={<UserOutlined/>}>
-                    <Link to="/main">我的任务</Link>
+                <Menu.Item>
+                    <div style={{width: "100%", textAlign: "center"}}>{userInfo.nickname || "用户名"}</div>
                 </Menu.Item>
-                <Menu.Item icon={<UserOutlined/>}>
-                    <Link to="/main">草稿箱</Link>
+                <Divider/>
+                <Menu.Item icon={<HomeOutlined/>}>
+                    <Link to="/main/tasks">我的任务</Link>
                 </Menu.Item>
+                <Menu.Item icon={<FileTextOutlined/>}>
+                    <Link to="/main/drafts">草稿箱</Link>
+                </Menu.Item>
+                <Menu.Item icon={<SettingOutlined/>}>
+                    <Link to="/main/sets">用户信息</Link>
+                </Menu.Item>
+                <Divider />
                 <Menu.Item>
                     <Button onClick={this.handelLogout} style={{width: "100%"}} type="link" >登出</Button>
                 </Menu.Item>
@@ -70,7 +80,7 @@ export default class Header extends Component {
                         placement="bottomRight"
                         >
                             <Link to="/main">
-                                <Avatar className="image" style={{backgroundColor: "orange"}} size="large"><UserOutlined /></Avatar>
+                                <Avatar className="image" style={{backgroundColor: "rgb(29, 142, 177)"}} size="large"><UserOutlined /></Avatar>
                             </Link>
                         </Dropdown>
                     ) : (

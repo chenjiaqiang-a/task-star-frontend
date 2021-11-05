@@ -1,19 +1,20 @@
 .card {
-    width: 350px;
-    height: 450px;
+    width: 250px;
+    height: 350px;
+    min-width: 250px;
     position: relative;
     padding: 20px;
-    background: rgba(119, 247, 215, 1);
+    background: rgb(108, 223, 243);
     box-shadow: 0px 1px 2px -2px rgba(0, 0, 0, 0.16),
         0px 3px 6px 0px rgba(0, 0, 0, 0.12),
         0px 5px 12px 4px rgba(0, 0, 0, 0.09);
-    margin: 0 auto;
+    margin: 0 20px;
     overflow: hidden;
     transition: 0.5s;
 
     .icon {
-        width: 75px;
-        height: 75px;
+        width: 60px;
+        height: 60px;
         border-radius: 50%;
         display: flex;
         align-items: center;
@@ -27,24 +28,35 @@
         font-size: 40px;
     }
 
-    .title {
+    .task-title {
         text-align: center;
         width: 100%;
-        padding: 10px;
-        font-size: 30px;
+        padding: 10px 20px;
+        margin: 0 auto;
+        font-size: 25px;
         font-weight: bold;
         color: rgba(0, 10, 10, 0.8);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
     }
 
-    .description {
+    .task-description {
         position: absolute;
         bottom: 40px;
         left: 0;
         padding: 0 20px 20px 20px;
         width: 100%;
         height: 40%;
-        font-size: 20px;
+        font-size: 17px;
         color: rgba(0, 10, 10, 0.99);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 4;
     }
 
     .button {
@@ -60,7 +72,7 @@
         cursor: pointer;
         z-index: 2;
         display: none;
-        background: black -webkit-linear-gradient(left, #f8f521, #f73e05 25%, #f8f521 50%, #f73e05 75%, #f8f521);
+        background: black -webkit-linear-gradient(left, #4121f8, #f70519 25%, #4121f8 50%, #f70519 75%, #4121f8);
         background-size:200% 100%; 
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;

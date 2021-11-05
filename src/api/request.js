@@ -1,7 +1,23 @@
-import axios from 'axios'
+import ajax from './ajax'
+import memoryUtils from '../utils/memoryUtils'
 
-const request = axios.create({
-    baseURL: "http://localhost:5000",
-})
 
-export default request
+function request(url, method='get', data={}) {
+    const headers = {
+        "Authorization": "Bearer " + memoryUtils.token,
+    }
+    return new Promise((resolve, reject) => {
+        ajax({
+            url,
+            method,
+            data,
+            headers,
+        }).then(response => {
+            resolve(response.data)
+        }).catch(err => {
+            reject(err)
+        })
+    })
+}
+
+export default request;

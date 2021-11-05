@@ -85,6 +85,14 @@ export default class DoTask extends Component {
         task: testTask,
         questions: testTask.questions
     }
+
+    componentDidMount() {
+        const { id } = this.props.match.params
+        // 获取任务详情
+
+        // 获取用户答案
+    }
+
     render() {
         const { task, questions } = this.state
         return (

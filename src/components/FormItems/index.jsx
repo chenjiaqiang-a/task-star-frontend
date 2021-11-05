@@ -11,8 +11,6 @@ import {
     TextAreaDisplay,
     DateInputDisplay,
 } from './Input';
-
-import './index.css'
 import { 
     CheckboxCreate, 
     CheckboxDisplay, 
@@ -21,7 +19,15 @@ import {
     RadioDisplay, 
     RadioDo 
 } from './Choice';
-
+import { 
+    FileUploaderCreate,
+    FileUploaderDisplay,
+    FileUploaderDo,
+    ImageUploaderCreate,
+    ImageUploaderDisplay,
+    ImageUploaderDo
+} from './Uploader';
+import './index.css'
 export class TextInput extends Component {
     render() {
         const { create, display } = this.props
@@ -80,4 +86,24 @@ export class CheckboxSelect extends Component {
             <CheckboxCreate {...this.props} />
         )
     }
+}
+
+export function ImageUploader(props) {
+    const { create, display } = props
+    return (display?
+        <ImageUploaderDisplay {...props} />:
+        !create?
+        <ImageUploaderDo {...props} />:
+        <ImageUploaderCreate {...props} />
+    )
+}
+
+export function FileUploader(props) {
+    const { create, display } = props
+    return (display?
+        <FileUploaderDisplay {...props} />:
+        !create?
+        <FileUploaderDo {...props} />:
+        <FileUploaderCreate {...props} />
+    )
 }

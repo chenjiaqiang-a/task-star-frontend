@@ -6,17 +6,18 @@ import './index.less'
 export default class Card extends Component {
 
     render() {
+        let {task} = this.props
         
         return (
             <div className="card">
                 <div className="icon">
                     <StarFilled />
                 </div>
-                <div className="title">
-                    任务的名称（20字左右）
+                <div className="task-title">
+                    {task.title}
                 </div>
-                <div className="description">
-                    任务的简介（60字左右）
+                <div className="task-description">
+                    {task.description}
                 </div>
                 <button onClick={this.handelTurnToTask} className="button">前往做任务</button>
             </div>
@@ -24,6 +25,7 @@ export default class Card extends Component {
     }
 
     handelTurnToTask = () => {
-        this.props.history.push("/dotask")
+        let {task} = this.props
+        this.props.history.push(`/dotask/${task.id}`)
     }
 }

@@ -8,58 +8,76 @@ import {
     Avatar,
     Statistic,
 } from 'antd'
-import { 
+import {
     SearchOutlined,
     UserOutlined,
     ArrowUpOutlined,
 } from '@ant-design/icons';
 
 import TaskDrawer from '../../../components/TaskDrawer'
+import Chart from '../../../components/Chart'
 import './index.less'
 
 const answers = [
     {
         id: "1",
-        author: {id:1,avatar:"",name:"author1"},
+        author: { id: 1, avatar: "", name: "author1" },
         submitTime: "2021-03-21",
     },
     {
         id: "2",
-        author: {id:2,avatar:"",name:"author2"},
+        author: { id: 2, avatar: "", name: "author2" },
         submitTime: "2021-03-21",
     },
     {
         id: "3",
-        author: {id:3,avatar:"",name:"author3"},
+        author: { id: 3, avatar: "", name: "author3" },
         submitTime: "2021-03-21",
     },
     {
         id: "4",
-        author: {id:4,avatar:"",name:"author4"},
+        author: { id: 4, avatar: "", name: "author4" },
         submitTime: "2021-03-21",
     },
     {
         id: "5",
-        author: {id:5,avatar:"",name:"author5"},
+        author: { id: 5, avatar: "", name: "author5" },
         submitTime: "2021-03-21",
     },
     {
         id: "6",
-        author: {id:6,avatar:"",name:"author6"},
+        author: { id: 6, avatar: "", name: "author6" },
         submitTime: "2021-03-21",
     },
     {
         id: "7",
-        author: {id:7,avatar:"",name:"author7"},
+        author: { id: 7, avatar: "", name: "author7" },
         submitTime: "2021-03-21",
     },
     {
         id: "8",
-        author: {id:8,avatar:"",name:"author8"},
+        author: { id: 8, avatar: "", name: "author8" },
         submitTime: "2021-03-21",
     },
 ]
 
+const options = {
+    title: {
+        text: 'ECharts 入门示例'
+    },
+    tooltip: {},
+    xAxis: {
+        data: ['衬衫', '羊毛衫', '雪纺衫', '裤子', '高跟鞋', '袜子']
+    },
+    yAxis: {},
+    series: [
+        {
+            name: '销量',
+            type: 'bar',
+            data: [5, 20, 36, 10, 10, 20]
+        }
+    ]
+}
 export default class TaskDataDisplay extends Component {
     state = {
         authorFilter: "",
@@ -116,8 +134,10 @@ export default class TaskDataDisplay extends Component {
                                 />
                             </Col>
                         </Row>
-                        <Row>
-                            <Col></Col>
+                        <Row style={{ height: 400,}}>
+                            <Col span={24} style={{display: "flex", justifyContent: "center" }}>
+                                <Chart chartId="task-line" options={options} />
+                            </Col>
                         </Row>
                     </Col>
                 </Row>
@@ -131,7 +151,7 @@ export default class TaskDataDisplay extends Component {
             authorFilter: e.target.value
         })
     }
-    handleShowAnswer =(taskId) => {
+    handleShowAnswer = (taskId) => {
         return () => {
             this.setState({
                 visible: true,
@@ -140,6 +160,6 @@ export default class TaskDataDisplay extends Component {
         }
     }
     handleClose = () => {
-        this.setState({visible: false})
+        this.setState({ visible: false })
     }
 }

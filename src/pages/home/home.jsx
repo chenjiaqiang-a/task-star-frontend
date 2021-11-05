@@ -8,8 +8,61 @@ import Card from '../../components/Card'
 import Header from '../../components/Header'
 import Footer from '../../components/Footer'
 
+const tasks = [
+    {
+        id: 1,
+        title: "大学生心理调查问卷1",
+        description: "Lorem ipsum dolor sit, amet consectetur adipisicing elit. In molestiae doloremque dolorem culpa dignissimos quas, eveniet quae, deleniti et suscipit blanditiis, eos itaque molestias inventore vitae omnis doloribus illum. Incidunt."
+    },
+    {
+        id: 2,
+        title: "大学生心理调查问卷2",
+        description: "Lorem ipsum dolor sit, amet consectetur adipisicing elit. In molestiae doloremque dolorem culpa dignissimos quas, eveniet quae, deleniti et suscipit blanditiis, eos itaque molestias inventore vitae omnis doloribus illum. Incidunt."
+    },
+    {
+        id: 3,
+        title: "大学生心理调查问卷3",
+        description: "Lorem ipsum dolor sit, amet consectetur adipisicing elit. In molestiae doloremque dolorem culpa dignissimos quas, eveniet quae, deleniti et suscipit blanditiis, eos itaque molestias inventore vitae omnis doloribus illum. Incidunt."
+    },
+    {
+        id: 4,
+        title: "大学生心理调查问卷4",
+        description: "Lorem ipsum dolor sit, amet consectetur adipisicing elit. In molestiae doloremque dolorem culpa dignissimos quas, eveniet quae, deleniti et suscipit blanditiis, eos itaque molestias inventore vitae omnis doloribus illum. Incidunt."
+    },
+    {
+        id: 5,
+        title: "大学生心理调查问卷5",
+        description: "Lorem ipsum dolor sit, amet consectetur adipisicing elit. In molestiae doloremque dolorem culpa dignissimos quas, eveniet quae, deleniti et suscipit blanditiis, eos itaque molestias inventore vitae omnis doloribus illum. Incidunt."
+    },
+    {
+        id: 6,
+        title: "大学生心理调查问卷6",
+        description: "Lorem ipsum dolor sit, amet consectetur adipisicing elit. In molestiae doloremque dolorem culpa dignissimos quas, eveniet quae, deleniti et suscipit blanditiis, eos itaque molestias inventore vitae omnis doloribus illum. Incidunt."
+    },
+]
+
 export default class Home extends Component {
+    state = {
+        hotTasks: [],
+        startIdx: 0
+    }
+
+    async componentDidMount() {
+        // 获取热门任务
+        this.setState({hotTasks: tasks})
+    }
     render() {
+        let {hotTasks, startIdx} = this.state
+        let count = 0
+        let tasks = []
+        while (hotTasks.length > 0 && count < 3) {
+            tasks.push(hotTasks[startIdx])
+            startIdx++
+            if (startIdx>=hotTasks.length) {
+                startIdx = 0
+            }
+            count++
+        }
         return (
             <div className="home">
                 <Header history={this.props.history} />
@@ -22,16 +75,15 @@ export default class Home extends Component {
                     <div className="hot-task">
                         <div className="title">
                             <h1>热门任务</h1>
-                            <Button type="link">换一批</Button>
+                            <Button type="link" onClick={this.handleNextGroup}>换一批</Button>
                         </div>
                         <div className="cards">
-                            <Row style={{width:"100%", minWidth:1200}} gutter={[16, 16]}>
-                                <Col span={8}><Card history={this.props.history} /></Col>
-                                <Col span={8}><Card history={this.props.history} /></Col>
-                                <Col span={8}><Card history={this.props.history} /></Col>
-                            </Row>
+                            <div className="cards-container">
+                                {tasks.map(task => (
+                                    <Card key={task.id} history={this.props.history} task={task} />
+                                ))}
+                            </div>
                         </div>
-
                     </div>
                     <div className="demonstration">
                         <div className="title">
@@ -45,5 +97,13 @@ export default class Home extends Component {
                 <Footer />
             </div>
         )
+    }
+    handleNextGroup = () => {
+        let {startIdx, hotTasks} = this.state
+        startIdx += 3
+        if(startIdx>=hotTasks.length){
+            startIdx = startIdx-hotTasks.length
+        }
+        this.setState({startIdx})
     }
 }

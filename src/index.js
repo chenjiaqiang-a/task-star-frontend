@@ -17,6 +17,7 @@ import noResult from './assets/images/no-result.png'
 
 memoryUtils.userInfo = storageUtils.getUserInfo()
 memoryUtils.isSignedIn = storageUtils.getIsSignedIn()
+memoryUtils.token = storageUtils.getToken()
 
 const emptyRender = () => (
     <Empty 

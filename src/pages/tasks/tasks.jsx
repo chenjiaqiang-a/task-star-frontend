@@ -103,7 +103,7 @@ export default class Tasks extends Component {
                     <div className="tasks-group-main">
                         <Row gutter={[16, 16]}>
                             <Col xs={12} lg={6}>
-                                <Link to="/create">
+                                <Link to="/createtask">
                                     <AddBlock />
                                 </Link>
                             </Col>
