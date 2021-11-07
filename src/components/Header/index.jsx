@@ -80,7 +80,7 @@ export default class Header extends Component {
                         placement="bottomRight"
                         >
                             <Link to="/main">
-                                <Avatar className="image" style={{backgroundColor: "rgb(29, 142, 177)"}} size="large"><UserOutlined /></Avatar>
+                                <Avatar className="image" style={{backgroundColor: "rgb(29, 142, 177)"}} size="large" icon={<UserOutlined />}></Avatar>
                             </Link>
                         </Dropdown>
                     ) : (
@@ -109,6 +109,7 @@ export default class Header extends Component {
         }
         storageUtils.removeIsSignedIn()
         this.setState({confirmLoading:false, visible: false})
+        this.props.history.replace("/home")
     }
     handleSearchTextChange = (event) => {
         this.setState({

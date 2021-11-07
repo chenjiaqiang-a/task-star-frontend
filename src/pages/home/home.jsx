@@ -1,12 +1,13 @@
 import React, { Component } from 'react'
 import {
-    Button, Col, Row,
+    Button,
 } from 'antd'
 
 import './home.less'
 import Card from '../../components/Card'
 import Header from '../../components/Header'
 import Footer from '../../components/Footer'
+import api from '../../api'
 
 const tasks = [
     {
@@ -49,7 +50,12 @@ export default class Home extends Component {
 
     async componentDidMount() {
         // 获取热门任务
-        this.setState({hotTasks: tasks})
+        const result = await api.getHotTask()
+        if (!result) {
+            this.setState({hotTasks: tasks})
+            return
+        }
+        this.setState({hotTasks: result})
     }
     render() {
         let {hotTasks, startIdx} = this.state

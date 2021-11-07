@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Avatar, Button, Col, Row, Tooltip } from 'antd';
+import { Avatar, Button, Col, message, Row, Tooltip } from 'antd';
 import {
     UserOutlined,
 } from '@ant-design/icons'
@@ -7,6 +7,9 @@ import {
 import './sets.less'
 import Editable from '../../components/Editable'
 import memoryUtils from '../../utils/memoryUtils';
+import api from '../../api';
+import storageUtils from '../../utils/storageUtils';
+import { isEmail } from '../../utils/tools';
 
 export default class Sets extends Component {
     state = {
@@ -15,11 +18,11 @@ export default class Sets extends Component {
         email: "",
         phone: "",
         userId: "",
+        rememberInfo: false,
         onEditDetail: false,
     }
     componentDidMount() {
-        let {username, email, nickname, phone, userId} = memoryUtils.userInfo
-        this.setState({username, email, nickname, phone, userId})
+        this.setState(memoryUtils.userInfo)
     }
     render() {
         let  {username, email, nickname, phone, onEditDetail} = this.state
@@ -37,35 +40,48 @@ export default class Sets extends Component {
                         <Col className="details" xs={24} lg={16}>
                             {!onEditDetail?(
                                 <div className="table">
-                                    <div className="row"><span>用户名：</span>{username}</div>
-                                    <div className="row"><span>昵称：</span>{nickname}</div>
-                                    <div className="row"><span>电子邮箱：</span>{email}</div>
-                                    <div className="row"><span>电话：</span>{phone}</div>
+                                    <div className="row">
+                                        <span className="column-head">用户名：</span>
+                                        {username}
+                                    </div>
+                                    <div className="row">
+                                        <span className="column-head">昵称：</span>
+                                        {nickname}
+                                    </div>
+                                    <div className="row">
+                                        <span className="column-head">电子邮箱：</span>
+                                        {email}
+                                    </div>
+                                    <div className="row">
+                                        <span className="column-head">电话：</span>
+                                        {phone}
+                                    </div>
                                     <div className="btn-group">
-                                        <Button>更改信息</Button>
+                                        <Button onClick={this.handleClickEditDetail}>更改信息</Button>
+                                        <Button>更改密码</Button>
                                     </div>
                                 </div>
                             ):(
                                 <div className="table">
                                     <div className="row">
-                                        <span>用户名：</span>
+                                        <span className="column-head">用户名：</span>
                                         {username}
                                     </div>
                                     <div className="row">
-                                        <span>昵称：</span>
-                                        <Editable>{nickname}</Editable>
+                                        <span className="column-head">昵称：</span>
+                                        <Editable onEdit={this.handleEditDetail("nickname")}>{nickname}</Editable>
                                     </div>
                                     <div className="row">
-                                        <span>电子邮箱：</span>
-                                        <Editable>{email}</Editable>
+                                        <span className="column-head">电子邮箱：</span>
+                                        <Editable onEdit={this.handleEditDetail("email")}>{email}</Editable>
                                     </div>
                                     <div className="row">
-                                        <span>电话：</span>
-                                        <Editable>{phone}</Editable>
+                                        <span className="column-head">电话：</span>
+                                        <Editable onEdit={this.handleEditDetail("phone")}>{phone}</Editable>
                                     </div>
                                     <div className="btn-group">
-                                        <Button >更改信息</Button>
-                                        <Button>更改密码</Button>
+                                        <Button onClick={this.handleCancelUpdate}>取消</Button>
+                                        <Button type="primary" onClick={this.handleUpdateDetail}>提交</Button>
                                     </div>
                                 </div>
                             )}
@@ -91,8 +107,45 @@ export default class Sets extends Component {
             }
         }
     }
+    handleClickEditDetail = () => {
+        this.setState({onEditDetail:true})
+    }
+    handleCancelUpdate = () => {
+        this.setState({onEditDetail: false, ...memoryUtils.userInfo})
+    }
     handleUpdateDetail = async () => {
-        let {userId, nickname, username, email, phone} = this.state
-        
+        let {userId, nickname, username, email, phone, rememberInfo} = this.state
+        let userInfo = {userId, nickname, username, email, phone, rememberInfo}
+        if (!email) {
+            message.error("电子邮箱不能为空！")
+            return
+        } else if (!nickname) {
+            message.error("昵称不能为空！")
+            return
+        } else if (!isEmail(email)) {
+            message.error("电子邮箱格式错误！")
+            return
+        } else if (phone.length !== 11) {
+            message.error("请填入11位的电话号码！")
+            return
+        }
+
+        // 请求更改用户信息
+        const result = await api.updateUserDetail(userInfo)
+        if (result === "ok") {
+            memoryUtils.userInfo = userInfo
+            storageUtils.saveUserInfo(userInfo)
+            message.success("更新成功！")
+        } else if (result === "token") {
+            memoryUtils.isSignedIn = false
+            storageUtils.removeIsSignedIn()
+            message.info("登录授权已过时，请重新登录！")
+            this.props.history.push("/login")
+            return
+        } else {
+            this.setState(memoryUtils.userInfo)
+            message.error("更新失败！")
+        }
+        this.setState({onEditDetail: false})
     }
 }

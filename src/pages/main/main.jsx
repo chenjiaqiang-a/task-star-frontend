@@ -3,6 +3,7 @@ import { Route, Switch, Redirect, Link } from 'react-router-dom'
 import {
     Layout,
     Menu,
+    message,
 } from 'antd';
 import {
     SnippetsOutlined,
@@ -18,10 +19,15 @@ import Tasks from '../tasks/tasks';
 import Drafts from '../drafts/drafts'
 import DataAnalysis from '../dataanalysis/dataanalysis'
 import Sets from '../sets/sets'
+import memoryUtils from '../../utils/memoryUtils';
 
 const { Sider, Content } = Layout
 class Main extends Component {
     render() {
+        if (!memoryUtils.isSignedIn) {
+            message.info("请先登录！")
+            return <Redirect to="/login" />
+        }
         const selectedKeys = [this.props.location.pathname.split("/").pop()]
         return (
             <div className="main">

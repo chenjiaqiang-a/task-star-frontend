@@ -34,7 +34,7 @@ export default class Editable extends Component {
                         onChange={this.handleTextChange}
                         value={content}
                         autoFocus
-                        rows={rows.length}
+                        rows={rows.length>3?rows.length:3}
                         onBlur={this.handleBlur}
                     />
         } else {

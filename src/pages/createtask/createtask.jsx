@@ -27,18 +27,23 @@ import './createtask.less'
 import Editable from '../../components/Editable'
 import { reorder } from '../../utils/tools'
 import QuestionCreate from '../../components/QuestionCreate'
+import memoryUtils from '../../utils/memoryUtils'
+import { Redirect } from 'react-router-dom'
+import api from '../../api'
+import storageUtils from '../../utils/storageUtils'
 
-const task = {
+const tempTask = {
     title: "任务名称",
     description: "任务描述",
     private: false,
     manySubmit: false,
+    creator: "",
+    status: 2,
     id: nanoid(),
 }
 const questions = [
     {
         id: "1",
-        task_id: task.id,
         question: "这是一个单行输入框",
         type: "text-input",
         choices: "",
@@ -47,7 +52,6 @@ const questions = [
     },
     {
         id: "2",
-        task_id: task.id,
         question: "这是一个多行输入框",
         type: "text-area",
         choices: "",
@@ -56,7 +60,6 @@ const questions = [
     },
     {
         id: "3",
-        task_id: task.id,
         question: "这是一个单项选择",
         type: "radio",
         choices: "选项一;选项二;[other]其它",
@@ -65,7 +68,6 @@ const questions = [
     },
     {
         id: "4",
-        task_id: task.id,
         question: "这是一个日期输入框",
         type: "date-input",
         choices: "",
@@ -74,7 +76,6 @@ const questions = [
     },
     {
         id: "5",
-        task_id: task.id,
         question: "这是一个多项选择",
         type: "checkbox",
         choices: "选项一;选项二",
@@ -85,12 +86,27 @@ const questions = [
 
 export default class CreateTask extends Component {
     state = {
-        task: task,
-        questions: questions,
+        task: tempTask,
+        questions: [],
         visible: false
+    }
+    async componentDidMount() {
+        let result = await api.refreshToken()
+        if (result) {
+            memoryUtils.token = result
+            storageUtils.saveToken(result)
+        } else {
+            message.info("登录授权过时，请重新登录！")
+            this.props.history.push("/login")
+        }
+
     }
 
     render() {
+        if (!memoryUtils.isSignedIn) {
+            message.info("请先登录！")
+            return <Redirect to="/login" />
+        }
         const {task, questions, visible} = this.state
         const modal = (
             <Modal
@@ -127,7 +143,7 @@ export default class CreateTask extends Component {
                         <Divider/>
                         <Space>
                             <Button onClick={this.handleSaveToDraft} >存入草稿</Button>
-                            <Button onClick={this.handleSaveTask} type="primary" >保存任务</Button>
+                            <Button onClick={this.handleSaveTask} type="primary" >创建任务</Button>
 
                         </Space>
                     </div>
@@ -243,14 +259,14 @@ export default class CreateTask extends Component {
         )
     }
     handleTitleEdit = (content) => {
-        this.setState({
-            title: content
-        })
+        let {task} = this.state
+        task.title = content
+        this.setState({task})
     }
     handleDescEdit = (content) => {
-        this.setState({
-            description: content
-        })
+        let {task} = this.state
+        task.description = content
+        this.setState({task})
     }
     onDragEnd = (result) => {
         if (!result.destination) {
@@ -321,9 +337,6 @@ export default class CreateTask extends Component {
     handleCancel = () => {
         this.setState({visible: false})
     }
-    handleSaveTask = () => {
-        this.props.history.replace("/main/tasks")
-    }
     handleCheckPublic = (e) => {
         let { task } = this.state
         task.private = !e.target.checked
@@ -334,19 +347,55 @@ export default class CreateTask extends Component {
         task.manySubmit = e.target.checked
         this.setState({task})
     }
-    handleSaveToDraft = () => {
-        
+    // 任务创建
+    handleSaveTask = async () => {
+        let {task, questions} = this.state
+        task.creator = memoryUtils.userInfo.userId
+        task.status = 2
+
+        const result = await api.createTask(task, questions)
+        if (!result) {
+            message.error("任务创建失败！")
+            return
+        } else if (result === "token") {
+            memoryUtils.isSignedIn = false
+            storageUtils.removeIsSignedIn()
+            message.info("登录授权过期，请重新登录！")
+            this.props.history.push("/login")
+            return
+        }
+        message.success("任务创建成功！")
+        this.props.history.replace("/main/tasks")
+    }
+    // 存入草稿
+    handleSaveToDraft = async () => {
+        let {task, questions} = this.state
+        task.creator = memoryUtils.userInfo.userId
+        task.status = 5
+
+        const result = await api.createTask(task, questions)
+        if (!result) {
+            message.error("任务保存失败！")
+            return
+        } else if (result === "token") {
+            memoryUtils.isSignedIn = false
+            storageUtils.removeIsSignedIn()
+            message.info("登录授权过期，请重新登录！")
+            this.props.history.push("/login")
+            return
+        }
+        message.success("任务保存成功！")
+        this.props.history.replace("/main/drafts")
     }
 
     // 表单插入函数
     addInput = () => { 
-        let {task, questions} = this.state
+        let { questions} = this.state
         let newQuestion = {
             id: nanoid(),
-            task_id: task.id,
             question: "这是一个单行输入框",
             type: "text-input",
-            choices: [],
+            choices: "non",
             required: true,
             selected: false
         }
@@ -354,13 +403,12 @@ export default class CreateTask extends Component {
         this.setState({questions})
     }
     addTextArea = () => {
-        let {task, questions} = this.state
+        let { questions} = this.state
         let newQuestion = {
             id: nanoid(),
-            task_id: task.id,
             question: "这是一个多行输入框",
             type: "text-area",
-            choices: "",
+            choices: "non",
             required: true,
             selected: false
         }
@@ -368,13 +416,12 @@ export default class CreateTask extends Component {
         this.setState({questions})
     }
     addDateInput = () => {
-        let {task, questions} = this.state
+        let { questions} = this.state
         let newQuestion = {
             id: nanoid(),
-            task_id: task.id,
             question: "这是一个日期选择框",
             type: "date-input",
-            choices: "",
+            choices: "non",
             required: true,
             selected: false
         }
@@ -382,10 +429,9 @@ export default class CreateTask extends Component {
         this.setState({questions})
     }
     addRadio = () => {
-        let {task, questions} = this.state
+        let { questions} = this.state
         let newQuestion = {
             id: nanoid(),
-            task_id: task.id,
             question: "这是一个单项选择",
             type: "radio",
             choices: "选项一;选项二",
@@ -396,10 +442,9 @@ export default class CreateTask extends Component {
         this.setState({questions})
     }
     addCheckbox = () => {
-        let {task, questions} = this.state
+        let { questions} = this.state
         let newQuestion = {
             id: nanoid(),
-            task_id: task.id,
             question: "这是一个多项选择",
             type: "checkbox",
             choices: "选项一;选项二",
@@ -410,10 +455,9 @@ export default class CreateTask extends Component {
         this.setState({questions})
     }
     addImageUploader = () => {
-        let {task, questions} = this.state
+        let { questions} = this.state
         let newQuestion = {
             id: nanoid(),
-            task_id: task.id,
             question: "这是一个图片上传",
             type: "image-uploader",
             choices: "1",
@@ -424,13 +468,12 @@ export default class CreateTask extends Component {
         this.setState({questions})
     }
     addFileUploader = () => {
-        let {task, questions} = this.state
+        let {questions} = this.state
         let newQuestion = {
             id: nanoid(),
-            task_id: task.id,
             question: "这是一个文件上传",
             type: "file-uploader",
-            choices: "",
+            choices: "non",
             required: true,
             selected: false
         }

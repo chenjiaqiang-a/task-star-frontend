@@ -20,7 +20,14 @@ const storageUtils = {
         store.set('user_info', userInfo)
     },
     getUserInfo () {
-        return store.get('user_info') || {rememberInfo: false}
+        return store.get('user_info') || {
+            rememberInfo: false,
+            username: "",
+            userId: "",
+            phone: "",
+            email: "",
+            nickname: ""
+        }
     },
     removeUserInfo () {
         store.remove('user_info')

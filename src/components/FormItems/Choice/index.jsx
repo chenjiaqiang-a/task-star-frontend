@@ -7,12 +7,12 @@ export class RadioDo extends Component {
     render() {
         let { choices, choose } = this.props
         return (
-            <Radio.Group onChange={this.handleChange} value={choose[0] ? choose[0] : ""}>
+            <Radio.Group onChange={this.handleChange} value={choose.length ? choose[0] : ""}>
                 <Space direction="vertical">
                     {choices.map((choice, idx) => (
-                        <Radio key={choice.id} value={choice.id}>
+                        <Radio key={idx} value={idx}>
                             {choice.text}
-                            {choice.other && choose[0] === choice.id ?
+                            {choice.other && choose[0] === idx ?
                                 <Input onChange={this.handleTextChange(idx)} style={{marginLeft: 15}} value={choice.value} />
                             :""}
                         </Radio>
@@ -44,7 +44,6 @@ export class RadioCreate extends Component {
                     {choices.map((choice, idx) =>{ 
                         let other = false
                         if (choice[0] === "[" && choice.slice(1, 6) === "other") {
-                            console.log("ok");
                             other = true
                             choice = choice.slice(7)
                         }
@@ -130,9 +129,9 @@ export class CheckboxDo extends Component {
             <Checkbox.Group onChange={this.handleChange} value={choose}>
                 <Space direction="vertical">
                     {choices.map((choice, idx) => (
-                        <Checkbox key={choice.id} value={choice.id}>
+                        <Checkbox key={idx} value={idx}>
                             {choice.text}
-                            {choice.other && choose.includes(choice.id) ?
+                            {choice.other && choose.includes(idx) ?
                                 <Input onChange={this.handleTextChange(idx)} style={{marginLeft: 25, marginTop: 10}} value={choice.value} />
                             : ""}
                         </Checkbox>

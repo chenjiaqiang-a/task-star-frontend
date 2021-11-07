@@ -177,8 +177,8 @@ export default class Login extends Component {
         const result = await api.reqLogin(signInUsername, signInPassword)
         if (result) {
             // 登录成功
-            const {user_name, userId, phone, token, nickname, email} = result
-            const userInfo = {username: user_name, userId, phone, rememberInfo, nickname, email}
+            const {username, userId, phone, token, nickname, email} = result
+            const userInfo = {username, userId, phone, rememberInfo, nickname, email}
             storageUtils.saveIsSignedIn(true)
             storageUtils.saveUserInfo(userInfo)
             storageUtils.saveToken(token)
@@ -187,7 +187,7 @@ export default class Login extends Component {
             memoryUtils.token = token
             this.setState({isSubmitting:false})
             message.success("登录成功！")
-            this.props.history.replace("/home")
+            this.props.history.goBack()
             return
         } else {
             // 登陆失败
@@ -241,9 +241,9 @@ export default class Login extends Component {
         }
         const userInfo = {
             username: signUpUsername,
-            pass: signUpPassword,
-            // email: email,
-            // nickname: signUpUsername,
+            password: signUpPassword,
+            email: email,
+            nickname: signUpUsername,
         }
         
         const result = await api.reqRegister(userInfo)
