@@ -12,12 +12,17 @@ import './dataanalysis.less'
 import TaskDataDisplay from './DataDisplay/TaskDataDisplay';
 import QuestionDataDisplay from './DataDisplay/QuestionDataDisplay';
 import FileDataDisplay from './DataDisplay/FileDataDisplay';
+import { Redirect } from 'react-router-dom';
 
 class DataAnalysis extends Component {
     state = {
         tabKey: "1",
     }
     render() {
+        if (!this.props.location.state) {
+            return <Redirect to="/main/tasks" />
+        }
+        let {taskId} = this.props.location.state
         let { tabKey } = this.state
                 
         return (
@@ -32,7 +37,7 @@ class DataAnalysis extends Component {
                             </span>
                         }
                     >
-                        <TaskDataDisplay />
+                        <TaskDataDisplay history={this.props.history} taskId={taskId} />
                     </Tabs.TabPane>
                     <Tabs.TabPane
                         key="2"
@@ -43,7 +48,7 @@ class DataAnalysis extends Component {
                             </span>
                         }
                     >
-                        <QuestionDataDisplay />
+                        <QuestionDataDisplay history={this.props.history} taskId={taskId} />
                     </Tabs.TabPane>
                     <Tabs.TabPane
                         key="3"
@@ -54,7 +59,7 @@ class DataAnalysis extends Component {
                             </span>
                         }
                     >
-                        <FileDataDisplay />
+                        <FileDataDisplay history={this.props.history} taskId={taskId} />
                     </Tabs.TabPane>
                 </Tabs>
             </div>

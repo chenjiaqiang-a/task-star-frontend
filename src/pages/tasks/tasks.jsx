@@ -5,6 +5,7 @@ import {
     Col,
     Pagination,
     Input,
+    Empty
 } from 'antd';
 import {
     SearchOutlined,
@@ -13,6 +14,8 @@ import {
 import DisplayBlock, {AddBlock} from '../../components/DisplayBlock'
 import './index.css'
 import TaskDrawer from '../../components/TaskDrawer';
+import memoryUtils from '../../utils/memoryUtils';
+import api from '../../api';
 
 export default class Tasks extends Component {
 
@@ -20,31 +23,42 @@ export default class Tasks extends Component {
         visible: false,
         create: false,
         showTaskId: "",
+        showAnswerId: "",
         createSearchText: "",
         createPage: 1,
         createPageSize: 3,
-        createdTasksList: [
-            {id: "1", title: "任务1", desc: "任务描述", private: false, published: true},
-            {id: "2", title: "任务2", desc: "任务描述", private: true, published: false},
-            {id: "3", title: "任务3", desc: "任务描述", private: false, published: false},
-            {id: "4", title: "任务4", desc: "任务描述", private: false, published: true},
-            {id: "5", title: "任务5", desc: "任务描述", private: false, published: true}
-        ],
+        createdTasksList: [],
         doSearchText: "",
         doPage: 1,
         doPageSize: 4,
-        doneTasksList: [
-            {id: "1", title: "任务1", desc: "任务描述", private: false},
-            {id: "2", title: "任务2", desc: "任务描述", private: false},
-            {id: "3", title: "任务3", desc: "任务描述", private: false},
-            {id: "4", title: "任务4", desc: "任务描述", private: false},
-            {id: "5", title: "任务5", desc: "任务描述", private: false},
-            {id: "6", title: "任务6", desc: "任务描述", private: false},
-            {id: "7", title: "任务7", desc: "任务描述", private: false},
-            {id: "8", title: "任务8", desc: "任务描述", private: false},
-            {id: "9", title: "任务9", desc: "任务描述", private: false},
-            {id: "10", title: "任务10", desc: "任务描述", private: false}
-        ],
+        doneTasksList: [],
+    }
+
+    async componentDidMount () {
+        // 我创建的任务
+        let userId = memoryUtils.userInfo.userId
+        let result = await api.getMyTasks(userId)
+        let resultList = []
+        result.forEach(item => {
+            if (item.status !== 5) {
+                resultList.push(item)
+            }
+        })
+        this.setState({
+            createdTasksList: resultList
+        })
+
+        // 我完成的任务
+        let doneTask = await api.getMyAnswers(userId)
+        let doneTasksList = []
+        doneTask.forEach(item => {
+            if (item.status !== 2) {
+                doneTasksList.push(item)
+            }
+        })
+        this.setState({
+            doneTasksList
+        })
     }
 
     onCreateSearchChange = (e) => {
@@ -73,9 +87,16 @@ export default class Tasks extends Component {
 
 
     render() {
-        const {visible, create, showTaskId} = this.state
+        const {visible, create, showTaskId, showAnswerId} = this.state
         let {createSearchText, createPage, createPageSize, createdTasksList} = this.state
         let {doSearchText, doPage, doPageSize, doneTasksList} = this.state
+        if (createSearchText.trim()) {
+            createdTasksList = createdTasksList.filter(task => task.title.indexOf(createSearchText)!==-1)
+        }
+        if (doSearchText.trim()) {
+            doneTasksList = doneTasksList.filter(task => task.title.indexOf(doSearchText))
+        }
+
         const createNum = createdTasksList.length
         const doNum =  doneTasksList.length
         createdTasksList = createdTasksList.slice(
@@ -101,14 +122,14 @@ export default class Tasks extends Component {
                         />
                     </div>
                     <div className="tasks-group-main">
-                        <Row gutter={[16, 16]}>
-                            <Col xs={12} lg={6}>
+                        <Row gutter={[16, 16]} style={{minHeight:300}}>
+                            <Col xs={12} lg={6} style={{minHeight:300}}>
                                 <Link to="/createtask">
                                     <AddBlock />
                                 </Link>
                             </Col>
                             {createdTasksList.map(task => (
-                                <Col onClick={this.displayTask(task.id, true)} key={task.id} xs={12} lg={6}>
+                                <Col style={{minHeight:300}} onClick={this.displayTask(task.id, true)} key={task.id} xs={12} lg={6}>
                                     <DisplayBlock history={this.props.history} create task={task} />
                                 </Col>
                             ))}
@@ -135,10 +156,20 @@ export default class Tasks extends Component {
                         />
                     </div>
                     <div className="tasks-group-main">
-                        <Row gutter={[16, 16]}>
-                            {doneTasksList.map(task => (
-                                <Col onClick={this.displayTask(task.id)} key={task.id} xs={12} lg={6}>
-                                    <DisplayBlock task={task} />
+                        <Row gutter={[16, 16]} style={{minHeight:300}}>
+                            {doneTasksList.length === 0?
+                            <div style={{width: "100%", display: "flex", alignItems: "center", justifyContent: "center"}}>
+                                <Empty 
+                                    image="https://gw.alipayobjects.com/zos/antfincdn/ZHrcdLPrvN/empty.svg"
+                                    imageStyle={{height: 150}}
+                                    description={
+                                        <span>暂无数据</span>
+                                    }
+                                />
+                            </div>:
+                            doneTasksList.map(task => (
+                                <Col style={{minHeight:300}} onClick={this.displayTask(task.id, false, task.answerId)} key={task.answerId} xs={12} lg={6}>
+                                    <DisplayBlock history={this.props.history} task={task} />
                                 </Col>
                             ))}
                         </Row>
@@ -151,20 +182,25 @@ export default class Tasks extends Component {
                         />
                     </div>
                 </div>
-                <TaskDrawer visible={visible} create={create} taskId={showTaskId} onClose={this.onClose} />
+                {visible?
+                <TaskDrawer visible={visible} create={create} taskId={showTaskId} answerId={showAnswerId} onClose={this.onClose} />
+                :""
+                }
             </div>
         );
     }
-    displayTask = (taskId, create=false) => {
+    displayTask = (taskId, create=false, anserId="") => {
         return () => {
             this.setState({
                 visible: true,
-                ShowTaskId: taskId,
-                create: create
+                showTaskId: taskId,
+                create: create,
+                showAnswerId: anserId
             })
         }
     }
     onClose = () => {
         this.setState({visible: false})
     }
+
 }

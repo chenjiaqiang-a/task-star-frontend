@@ -14,3 +14,29 @@ export function reorder (list, startIdx, endIdx) {
 
     return result
 }
+
+// 组合问题和答案
+export function combineQuestionAndAnswer(questions, answers) {
+    answers.forEach(answer => {
+        let index = questions.findIndex(item => item.id === answer.questionId)
+        if (questions[index].type === "radio" || questions[index].type === "checkbox") {
+            let value = answer.value.split(";")
+            value = value.map(val => {
+                if(val[0] === "[" && val.slice(1,6) === "other") {
+                    val = val.slice(7)
+                    let idx = val.indexOf(":")
+                    let text = val.slice(idx+1)
+                    val = val.slice(0, idx)
+                    questions[index].choices[val*1].value = text
+                }
+                return val*1
+            })
+            questions[index].choose = value
+        } else {
+            questions[index].value = answer.value
+        }
+        questions[index].answerId = answer.id
+    })
+    
+    return questions
+}

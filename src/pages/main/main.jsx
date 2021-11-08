@@ -45,8 +45,8 @@ class Main extends Component {
                                 <Menu.Item key="drafts" icon={<SnippetsOutlined />}>
                                     <Link to="/main/drafts">草稿箱</Link>
                                 </Menu.Item>
-                                <Menu.Item key="data-analysis" icon={<BarChartOutlined />}>
-                                    <Link to="/main/data-analysis">数据分析</Link>
+                                <Menu.Item key="data-analysis" disabled={selectedKeys[0]!=="data-analysis"} icon={<BarChartOutlined />}>
+                                    数据分析
                                 </Menu.Item>
                                 <Menu.Item key="sets" icon={<SettingOutlined />}>
                                     <Link to="/main/sets">设置</Link>

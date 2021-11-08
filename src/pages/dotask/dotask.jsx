@@ -12,77 +12,8 @@ import Question from '../../components/Question';
 import memoryUtils from '../../utils/memoryUtils';
 import api from '../../api';
 import storageUtils from '../../utils/storageUtils';
+import { combineQuestionAndAnswer } from '../../utils/tools';
 
-const testTask = {
-    title: "测试任务",
-    description: "这是一个测试任务\n这是一个测试任务第二行",
-    id: "11111",
-    questions: [
-        {
-            id: 1,
-            order: 1,
-            task_id: "11111",
-            question: "这是一个单行输入框",
-            type: "text-input",
-            value: "abc",
-            choices: [],
-            choose: [],
-            required: true,
-        },
-        {
-            id: 2,
-            order: 2,
-            task_id: "11111",
-            question: "这是一个多行输入框",
-            type: "text-area",
-            value: "",
-            choices: [],
-            choose: [],
-            required: false,
-        },
-        {
-            id: 3,
-            order: 3,
-            task_id: "11111",
-            question: "这是一个日期输入框",
-            type: "date-input",
-            value: "",
-            choices: [],
-            choose: [],
-            required: false,
-        },
-        {
-            id: 4,
-            order: 4,
-            task_id: "11111",
-            question: "这是一个单项选择",
-            type: "radio",
-            value: "",
-            choices: [
-                {id: 1, question_id: 4, text: "选项一", other: false}, 
-                {id: 2, question_id: 4, text: "选项二", other: false}, 
-                {id: 3, question_id: 4, text: "其它", other: true, value: ""}
-            ],
-            choose: [],
-            required: true,
-        },
-        {
-            id: 5,
-            order: 5,
-            task_id: "11111",
-            question: "这是一个单项选择",
-            type: "checkbox",
-            value: "",
-            choices: [
-                {id: '1', question_id: 4, text: "选项一", other: false}, 
-                {id: '2', question_id: 4, text: "选项二", other: false}, 
-                {id: '3', question_id: 4, text: "其它", other: true, value: ""}
-            ],
-            choose: [],
-            required: true,
-        }
-    ]
-}
 
 function getAnswerContent(answer) {
     let value
@@ -116,8 +47,14 @@ function getAnswerContent(answer) {
 
 export default class DoTask extends Component {
     state = {
-        task: testTask,
-        questions: testTask.questions
+        task: {
+            title:"",
+            description: "",
+            id: ""
+        },
+        questions: [],
+        modify:false,
+        answerId:""
     }
 
     async componentDidMount() {
@@ -129,16 +66,38 @@ export default class DoTask extends Component {
             storageUtils.removeIsSignedIn()
             message.info("登录授权已过期，请重新登录！")
             this.props.history.push("/login")
+            return
         } else if (!result) {
             message.info("获取任务失败！")
             this.props.history.goBack()
+            return
         }
-        this.setState({
-            task: result.task,
-            questions: result.questions
-        })
-
+        
+        let {task, questions} = result
         // 获取用户答案
+        if (this.props.location.state) {
+            let {answerId} = this.props.location.state
+            const answer = await api.getAnswerById(answerId)
+            if (!answer) {
+                message.error("获取答案失败！")
+            } else {
+                questions = combineQuestionAndAnswer(questions, answer)
+            }
+
+            this.setState({
+                task,
+                questions,
+                modify:true,
+                answerId,
+            })
+            return
+        }
+
+
+        this.setState({
+            task,
+            questions
+        })
     }
 
     render() {
@@ -201,12 +160,13 @@ export default class DoTask extends Component {
         }
     }
     handleSaveToDraft = async () => {
-        let {task, questions} = this.state
+        let {task, questions, modify, answerId} = this.state
         let answers = questions.map(item => {
             let answer = {}
             answer.question_id = item.id
             answer.task_id = item.task_id
             answer.content = getAnswerContent(item)
+            answer.id = item.answerId
             return answer
         })
         let note = {
@@ -214,7 +174,25 @@ export default class DoTask extends Component {
             task_id: task.id,
             create_time: new Date(),
             update_time: new Date(),
-            status: 2
+            status: 2,
+            id: answerId
+        }
+
+        if (modify) {
+            let result = await api.updateAnswer(note, answers)
+            if (result === "token") {
+                message.error("提交失败！")
+                return
+            } else if (!result) {
+                memoryUtils.isSignedIn = false
+                storageUtils.removeIsSignedIn()
+                message.info("登录授权已过期，请重新登录！")
+                this.props.history.push("/login")
+                return
+            }
+            message.success("提交成功！")
+            this.props.history.replace("/main/drafts")
+            return
         }
 
         let result = await api.submitAnswer(note, answers)
@@ -232,13 +210,14 @@ export default class DoTask extends Component {
         this.props.history.replace("/main/drafts")
     }
     handleSubmitTask = async () => {
-        let {task, questions} = this.state
+        let {task, questions, modify, answerId} = this.state
         let complete = true
         let answers = questions.map(item => {
             let answer = {}
             answer.question_id = item.id
             answer.task_id = item.task_id
             answer.content = getAnswerContent(item)
+            answer.id = item.answerId
             if (item.required && !answer.content) {
                 complete = false
             }
@@ -255,7 +234,25 @@ export default class DoTask extends Component {
             task_id: task.id,
             create_time: new Date(),
             update_time: new Date(),
-            status: 1
+            status: 1,
+            id: answerId
+        }
+
+        if (modify) {
+            let result = await api.updateAnswer(note, answers)
+            if (result === "token") {
+                message.error("提交失败！")
+                return
+            } else if (!result) {
+                memoryUtils.isSignedIn = false
+                storageUtils.removeIsSignedIn()
+                message.info("登录授权已过期，请重新登录！")
+                this.props.history.push("/login")
+                return
+            }
+            message.success("提交成功！")
+            this.props.history.replace("/main/tasks")
+            return
         }
         
         let result = await api.submitAnswer(note, answers)

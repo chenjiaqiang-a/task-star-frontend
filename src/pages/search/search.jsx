@@ -5,35 +5,7 @@ import Header from '../../components/Header'
 import Footer from "../../components/Footer";
 import './search.less'
 import { Link, Redirect } from 'react-router-dom';
-
-
-const resultsList = [
-    {
-        title: "测试数据1",
-        id: "1",
-        desc: "测试数据1的描述",
-    },
-    {
-        title: "测试数据2",
-        id: "2",
-        desc: "测试数据2的描述",
-    },
-    {
-        title: "测试数据3",
-        id: "3",
-        desc: "测试数据3的描述",
-    },
-    {
-        title: "测试数据4",
-        id: "4",
-        desc: "测试数据4的描述",
-    },
-    {
-        title: "测试数据5",
-        id: "5",
-        desc: "测试数据5的描述",
-    },
-]
+import api from '../../api';
 
 export default class Search extends Component {
     state = {
@@ -42,30 +14,28 @@ export default class Search extends Component {
         searchText: ""
     }
 
-    componentDidUpdate() {
+    async componentDidUpdate() {
         const { search } = this.props.location
         const { searchText } = this.state;
         const kw = new URLSearchParams(search).get('kw')
         if (kw !== searchText) {
             this.setState({searchText: kw, loading: true})
-            setTimeout(() => {
-                this.setState({
-                    loading: false,
-                    results: resultsList
-                })
-            }, 1000)
+            const result = await api.searchTasks(kw)
+            this.setState({
+                loading: false,
+                results: result
+            })
         }
     }
-    componentDidMount() {
+    async componentDidMount() {
         const { search } = this.props.location
         const kw = new URLSearchParams(search).get('kw')
-        setTimeout(() => {
-            this.setState({
-                searchText: kw,
-                loading: false,
-                results: resultsList
-            })
-        }, 1000)
+        const result = await api.searchTasks(kw)
+        this.setState({
+            searchText: kw,
+            loading: false,
+            results: result
+        })
     }
     
     render() {
@@ -95,8 +65,8 @@ export default class Search extends Component {
                                 renderItem={item => (
                                     <List.Item key={item.id}>
                                         <List.Item.Meta
-                                            title={<Link to="/dotask">{item.title}</Link>}
-                                            description={item.desc}
+                                            title={<Link to={`/dotask/${item.id}`}>{item.title}</Link>}
+                                            description={item.description}
                                         />
                                     </List.Item>
                                 )}

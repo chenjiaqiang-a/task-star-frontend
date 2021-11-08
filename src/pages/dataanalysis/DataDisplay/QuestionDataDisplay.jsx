@@ -5,6 +5,7 @@ import {
     List,
     Input,
     Button,
+    message,
 } from 'antd'
 import { 
     SearchOutlined,
@@ -12,78 +13,61 @@ import {
 
 import './index.less'
 import QuestionDisplay from '../../../components/QuestionDisplay';
+import api from '../../../api';
+import memoryUtils from '../../../utils/memoryUtils';
+import storageUtils from '../../../utils/storageUtils';
+import Chart from '../../../components/Chart';
 
-const questions = [
-    {
-        id: 1,
-        order: 1,
-        task_id: "11111",
-        question: "这是一个单行输入框",
-        type: "text-input",
-        value: "",
-        choices: [],
-        choose: [],
-        required: true,
+const options = {
+    title: {
+        text: '表单项提交情况'
     },
-    {
-        id: 2,
-        order: 2,
-        task_id: "11111",
-        question: "这是一个多行输入框",
-        type: "text-area",
-        value: "",
-        choices: [],
-        choose: [],
-        required: false,
-    },
-    {
-        id: 3,
-        order: 3,
-        task_id: "11111",
-        question: "这是一个日期输入框",
-        type: "date-input",
-        value: "",
-        choices: [],
-        choose: [],
-        required: false,
-    },
-    {
-        id: 4,
-        order: 4,
-        task_id: "11111",
-        question: "这是一个单项选择",
-        type: "radio",
-        value: "",
-        choices: [
-            {id: 1, question_id: 4, text: "选项一", other: false}, 
-            {id: 2, question_id: 4, text: "选项二", other: false}, 
-            {id: 3, question_id: 4, text: "其它", other: true, value: ""}
-        ],
-        choose: [],
-        required: true,
-    },
-    {
-        id: 5,
-        order: 5,
-        task_id: "11111",
-        question: "这是一个单项选择",
-        type: "checkbox",
-        value: "",
-        choices: [
-            {id: '1', question_id: 4, text: "选项一", other: false}, 
-            {id: '2', question_id: 4, text: "选项二", other: false}, 
-            {id: '3', question_id: 4, text: "其它", other: true, value: ""}
-        ],
-        choose: [],
-        required: true,
-    }
-]
+    series: [
+        {
+            type: 'pie',
+            data: [
+                {
+                    value: 0,
+                    name: '22：00之前'
+                },
+                {
+                    value: 1,
+                    name: '22：00-23：00'
+                },
+                {
+                    value: 2,
+                    name: '23：00之后'
+                }
+            ]
+        }
+    ]
+}
 
 export default class QuestionDataDisplay extends Component {
     state = {
-        questions: questions,
+        questions: [],
         nameFilter: "",
         showQuestionIdx: 0,
+    }
+
+    async componentDidMount() {
+        let {taskId} = this.props
+        // 获取任务详情
+        const result = await api.getTaskById(taskId)
+        if (result === "token") {
+            memoryUtils.isSignedIn = false
+            storageUtils.removeIsSignedIn()
+            message.info("登录授权已过期，请重新登录！")
+            this.props.history.push("/login")
+            return
+        } else if (!result) {
+            message.info("获取任务失败！")
+            this.props.history.goBack()
+            return
+        }
+        
+        let {questions} = result
+        this.setState({questions})
     }
     render() {
         let { questions, nameFilter, showQuestionIdx } = this.state
@@ -120,7 +104,16 @@ export default class QuestionDataDisplay extends Component {
                         <Row gutter={[16]} style={{ height: 200, display: "flex", alignItems: "center" }}>
                             <Col span={24}>
                                 <div style={{fontSize: 30, fontWeight: "bold"}}>问题描述</div>
+                                {questions.length>0?                                
                                 <QuestionDisplay question={questions[showQuestionIdx]} order={showQuestionIdx+1} />
+                                :""}
+                            </Col>
+                        </Row>
+                        <Row style={{ height: 400,}}>
+                            <Col span={24} style={{display: "flex", justifyContent: "center" }}>
+                                <div style={{width: "80%"}}>
+                                    <Chart chartId="task-pie" options={options} />
+                                </div>
                             </Col>
                         </Row>
                     </Col>

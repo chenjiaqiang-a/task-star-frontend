@@ -7,6 +7,7 @@ import {
     Button,
     Avatar,
     Statistic,
+    message,
 } from 'antd'
 import {
     SearchOutlined,
@@ -17,76 +18,56 @@ import {
 import TaskDrawer from '../../../components/TaskDrawer'
 import Chart from '../../../components/Chart'
 import './index.less'
+import api from '../../../api';
+import memoryUtils from '../../../utils/memoryUtils';
+import storageUtils from '../../../utils/storageUtils';
 
-const answers = [
-    {
-        id: "1",
-        author: { id: 1, avatar: "", name: "author1" },
-        submitTime: "2021-03-21",
-    },
-    {
-        id: "2",
-        author: { id: 2, avatar: "", name: "author2" },
-        submitTime: "2021-03-21",
-    },
-    {
-        id: "3",
-        author: { id: 3, avatar: "", name: "author3" },
-        submitTime: "2021-03-21",
-    },
-    {
-        id: "4",
-        author: { id: 4, avatar: "", name: "author4" },
-        submitTime: "2021-03-21",
-    },
-    {
-        id: "5",
-        author: { id: 5, avatar: "", name: "author5" },
-        submitTime: "2021-03-21",
-    },
-    {
-        id: "6",
-        author: { id: 6, avatar: "", name: "author6" },
-        submitTime: "2021-03-21",
-    },
-    {
-        id: "7",
-        author: { id: 7, avatar: "", name: "author7" },
-        submitTime: "2021-03-21",
-    },
-    {
-        id: "8",
-        author: { id: 8, avatar: "", name: "author8" },
-        submitTime: "2021-03-21",
-    },
-]
 
 const options = {
     title: {
-        text: 'ECharts 入门示例'
+        text: '近日表单提交情况'
     },
     tooltip: {},
     xAxis: {
-        data: ['衬衫', '羊毛衫', '雪纺衫', '裤子', '高跟鞋', '袜子']
+        data: ['11/3', '11/4', '11/5', '11/6', '11/7', '11/8']
     },
     yAxis: {},
     series: [
         {
-            name: '销量',
+            name: '提交数',
             type: 'bar',
-            data: [5, 20, 36, 10, 10, 20]
+            data: [0, 0, 0, 0, 0, 3]
         }
     ]
 }
 export default class TaskDataDisplay extends Component {
     state = {
         authorFilter: "",
-        answers: answers,
+        answers: [],
         showTaskId: "",
         visible: false,
+        showAnswerId: ""
+    }
+
+    async componentDidMount () {
+        let {taskId} = this.props
+        let answers = await api.getTaskAnswers(taskId)
+        if (!answers) {
+            message.error("任务提交获取失败！")
+            this.props.history.goBack()
+            return
+        } else if (answers==="token") {
+            memoryUtils.isSignedIn = false
+            storageUtils.removeIsSignedIn()
+            message.info()
+            this.props.history.push("/login")
+            return
+        }
+
+        this.setState({answers, showTaskId:taskId})
     }
     render() {
-        let { showTaskId, visible, answers, authorFilter } = this.state
+        let { showTaskId, visible, answers, authorFilter, showAnswerId } = this.state
         let ansNum = answers.length
         answers = answers.filter(item => (item.author.name.indexOf(authorFilter) !== -1))
 
@@ -111,7 +92,7 @@ export default class TaskDataDisplay extends Component {
                                     <List.Item key={item.id}>
                                         <List.Item.Meta
                                             avatar={item.author.avatar ? <Avatar src={item.author.avatar} /> : <Avatar icon={<UserOutlined />} />}
-                                            title={<Button type="link" onClick={this.handleShowAnswer(item.id)}>{item.author.name}</Button>}
+                                            title={<Button type="link" onClick={this.handleShowAnswer(showTaskId, item.id)}>{item.author.name}</Button>}
                                             description={item.submitTime}
                                         />
                                     </List.Item>
@@ -136,12 +117,17 @@ export default class TaskDataDisplay extends Component {
                         </Row>
                         <Row style={{ height: 400,}}>
                             <Col span={24} style={{display: "flex", justifyContent: "center" }}>
-                                <Chart chartId="task-line" options={options} />
+                                <div style={{width: "80%"}}>
+                                    <Chart chartId="task-line" options={options} />
+                                </div>
                             </Col>
                         </Row>
                     </Col>
                 </Row>
-                <TaskDrawer visible={visible} taskId={showTaskId} onClose={this.handleClose} />
+                {visible?
+                <TaskDrawer visible={visible} taskId={showTaskId} answerId={showAnswerId} onClose={this.handleClose} />
+                :""
+                }
             </div>
         )
     }
@@ -151,11 +137,12 @@ export default class TaskDataDisplay extends Component {
             authorFilter: e.target.value
         })
     }
-    handleShowAnswer = (taskId) => {
+    handleShowAnswer = (taskId, answerId) => {
         return () => {
             this.setState({
                 visible: true,
-                showTaskId: taskId
+                showTaskId: taskId,
+                showAnswerId: answerId
             })
         }
     }

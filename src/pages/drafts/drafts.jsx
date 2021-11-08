@@ -1,33 +1,47 @@
 import React, { Component } from 'react';
-import {  Empty, Space, Collapse } from 'antd'
+import {  Empty, Space, Collapse, Tooltip, Button } from 'antd'
 import {
-    DeleteOutlined
+    RightOutlined
 } from '@ant-design/icons'
 
+import api from '../../api'
 import './index.css'
+import memoryUtils from '../../utils/memoryUtils';
 
 const {Panel} = Collapse
-
-const tasks = [{
-    id: "1",
-    title: "任务名称",
-    description: "任务描述 A dog is a type of domesticated animal. Known for its loyalty and faithfulness, it can be found as a welcome guest in many households across the world."
-}, {
-    id: "2",
-    title: "任务名称",
-    description: "任务描述 A dog is a type of domesticated animal. Known for its loyalty and faithfulness, it can be found as a welcome guest in many households across the world."
-}, {
-    id: "3",
-    title: "任务名称",
-    description: "任务描述 A dog is a type of domesticated animal. Known for its loyalty and faithfulness, it can be found as a welcome guest in many households across the world."
-}]
-
-
 
 class Drafts extends Component {
     state = {
         createTasks: [],
-        doTasks: tasks
+        doTasks: []
+    }
+
+    async componentDidMount () {
+        // 我创建的任务
+        let userId = memoryUtils.userInfo.userId
+        let result = await api.getMyTasks(userId)
+        let resultList = []
+        result.forEach(item => {
+            if (item.status === 5) {
+                resultList.push(item)
+            }
+        })
+        this.setState({
+            createTasks: resultList
+        })
+
+        // 我完成的任务
+        // 我完成的任务
+        let doTask = await api.getMyAnswers(userId)
+        let doTasksList = []
+        doTask.forEach(item => {
+            if (item.status === 2) {
+                doTasksList.push(item)
+            }
+        })
+        this.setState({
+            doTasks:doTasksList
+        })
     }
 
     render() {
@@ -52,7 +66,15 @@ class Drafts extends Component {
                                 {createTasks.map((task) => {
                                     return (
                                         <Collapse defaultActiveKey={['1']} key={task.id}>
-                                            <Panel key="1" header={task.title} extra={<DeleteOutlined />}>
+                                            <Panel
+                                                key="1"
+                                                header={task.title}
+                                                extra={
+                                                    <Tooltip title="继续完善任务">
+                                                        <Button onClick={this.handleCompleteTask(task.id)} type="link"><RightOutlined /></Button>
+                                                    </Tooltip>
+                                                }
+                                            >
                                                 {task.description}
                                             </Panel>
                                         </Collapse>
@@ -81,7 +103,15 @@ class Drafts extends Component {
                                 {doTasks.map((task) => {
                                     return (
                                         <Collapse defaultActiveKey={['1']} key={task.id}>
-                                            <Panel key="1" header={task.title} extra={<DeleteOutlined />}>
+                                            <Panel
+                                                key="1"
+                                                header={task.title}
+                                                extra={
+                                                    <Tooltip title="继续未完成的任务">
+                                                        <Button onClick={this.handleRedoTask(task.id, task.answerId)} type="link"><RightOutlined /></Button>
+                                                    </Tooltip>
+                                                }
+                                            >
                                                 {task.description}
                                             </Panel>
                                         </Collapse>
@@ -93,6 +123,20 @@ class Drafts extends Component {
                 </div>
             </div>
         );
+    }
+
+    handleCompleteTask = (id) => {
+        return (e) => {
+            e.stopPropagation()
+            this.props.history.push("/createtask", {taskId: id})
+        }
+    }
+
+    handleRedoTask = (taskId, answerId) => {
+        return (e) => {
+            e.stopPropagation()
+            this.props.history.push(`/dotask/${taskId}`, {answerId})
+        }
     }
 }
 

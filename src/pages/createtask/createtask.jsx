@@ -41,54 +41,14 @@ const tempTask = {
     status: 2,
     id: nanoid(),
 }
-const questions = [
-    {
-        id: "1",
-        question: "这是一个单行输入框",
-        type: "text-input",
-        choices: "",
-        required: true,
-        selected: false
-    },
-    {
-        id: "2",
-        question: "这是一个多行输入框",
-        type: "text-area",
-        choices: "",
-        required: false,
-        selected: false
-    },
-    {
-        id: "3",
-        question: "这是一个单项选择",
-        type: "radio",
-        choices: "选项一;选项二;[other]其它",
-        selected: false,
-        required: true,
-    },
-    {
-        id: "4",
-        question: "这是一个日期输入框",
-        type: "date-input",
-        choices: "",
-        required: false,
-        selected: false
-    },
-    {
-        id: "5",
-        question: "这是一个多项选择",
-        type: "checkbox",
-        choices: "选项一;选项二",
-        selected: false,
-        required: true,
-    },
-]
 
 export default class CreateTask extends Component {
     state = {
         task: tempTask,
         questions: [],
-        visible: false
+        deletedQuestion: [],
+        visible: false,
+        modify: false
     }
     async componentDidMount() {
         let result = await api.refreshToken()
@@ -96,10 +56,32 @@ export default class CreateTask extends Component {
             memoryUtils.token = result
             storageUtils.saveToken(result)
         } else {
+            memoryUtils.isSignedIn = false
+            storageUtils.removeIsSignedIn()
             message.info("登录授权过时，请重新登录！")
             this.props.history.push("/login")
         }
 
+        if (this.props.location.state) {
+            let {taskId} = this.props.location.state
+            let taskResult = await api.getTaskById(taskId, true)
+            if (!taskResult) {
+                message.error("获取任务失败！")
+                this.props.history.goBack()
+                return
+            } else if (taskResult === "token") {
+                memoryUtils.isSignedIn = false
+                storageUtils.removeIsSignedIn()
+                message.info("登录授权过期，请重新登录！")
+                this.props.history.push("/login")
+            } else {
+                this.setState({
+                    task: taskResult.task,
+                    questions: taskResult.questions,
+                    modify: true
+                })
+            }
+        }
     }
 
     render() {
@@ -168,7 +150,7 @@ export default class CreateTask extends Component {
                                             style={this.getListStyle(snapshot.isDraggingOver)}
                                         >
                                             {questions.map((question, idx) => (
-                                                <Draggable key={question.id} draggableId={question.id} index={idx}>
+                                                <Draggable key={question.id} draggableId={question.id+""} index={idx}>
                                                     {(provided, snapshot) => (
                                                         <div 
                                                             className={question.selected? "question-item selected" : "question-item"}
@@ -308,9 +290,13 @@ export default class CreateTask extends Component {
     }
     handleDelete = (index) => {
         return () => {
-            let {questions} = this.state
+            let {questions, deletedQuestion} = this.state
+            if (questions[index].status !== 3) {
+                questions[index].status = 2
+                deletedQuestion.push(questions[index])
+            }
             questions.splice(index, 1)
-            this.setState({questions, visible: false})
+            this.setState({questions, visible: false, deletedQuestion})
         }
     }
     handleUncheckAll = () => {
@@ -331,8 +317,16 @@ export default class CreateTask extends Component {
         })
     }
     handleOk = () => {
-        let questions = this.state.questions.filter((question) => !question.selected)
-        this.setState({questions, visible: false})
+        let {questions, deletedQuestion} = this.state
+        questions.forEach(item => {
+            if (item.selected) {
+                item.status = 2
+                deletedQuestion.push(item)
+            }
+        })
+
+        questions = questions.filter((question) => !question.selected)
+        this.setState({questions, visible: false, deletedQuestion})
     }
     handleCancel = () => {
         this.setState({visible: false})
@@ -349,9 +343,26 @@ export default class CreateTask extends Component {
     }
     // 任务创建
     handleSaveTask = async () => {
-        let {task, questions} = this.state
+        let {task, questions, deletedQuestion, modify} = this.state
         task.creator = memoryUtils.userInfo.userId
         task.status = 2
+
+        if (modify) {
+            const result = await api.updateTaskDetail(task, questions, deletedQuestion)
+            if (!result) {
+                message.error("任务更新失败！")
+                return
+            } else if (result === "token") {
+                memoryUtils.isSignedIn = false
+                storageUtils.removeIsSignedIn()
+                message.info("登录授权过期，请重新登录！")
+                this.props.history.push("/login")
+                return
+            }
+            message.success("任务更新成功！")
+            this.props.history.replace("/main/tasks")
+            return
+        }
 
         const result = await api.createTask(task, questions)
         if (!result) {
@@ -369,9 +380,26 @@ export default class CreateTask extends Component {
     }
     // 存入草稿
     handleSaveToDraft = async () => {
-        let {task, questions} = this.state
+        let {task, questions, deletedQuestion, modify} = this.state
         task.creator = memoryUtils.userInfo.userId
         task.status = 5
+
+        if (modify) {
+            const result = await api.updateTaskDetail(task, questions, deletedQuestion)
+            if (!result) {
+                message.error("任务保存失败！")
+                return
+            } else if (result === "token") {
+                memoryUtils.isSignedIn = false
+                storageUtils.removeIsSignedIn()
+                message.info("登录授权过期，请重新登录！")
+                this.props.history.push("/login")
+                return
+            }
+            message.success("任务保存成功！")
+            this.props.history.replace("/main/drafts")
+            return
+        }
 
         const result = await api.createTask(task, questions)
         if (!result) {
@@ -397,7 +425,8 @@ export default class CreateTask extends Component {
             type: "text-input",
             choices: "non",
             required: true,
-            selected: false
+            selected: false,
+            status: 3
         }
         questions.push(newQuestion)
         this.setState({questions})
@@ -410,7 +439,8 @@ export default class CreateTask extends Component {
             type: "text-area",
             choices: "non",
             required: true,
-            selected: false
+            selected: false,
+            status: 3
         }
         questions.push(newQuestion)
         this.setState({questions})
@@ -423,7 +453,8 @@ export default class CreateTask extends Component {
             type: "date-input",
             choices: "non",
             required: true,
-            selected: false
+            selected: false,
+            status: 3
         }
         questions.push(newQuestion)
         this.setState({questions})
@@ -436,7 +467,8 @@ export default class CreateTask extends Component {
             type: "radio",
             choices: "选项一;选项二",
             required: true,
-            selected: false
+            selected: false,
+            status: 3
         }
         questions.push(newQuestion)
         this.setState({questions})
@@ -449,7 +481,8 @@ export default class CreateTask extends Component {
             type: "checkbox",
             choices: "选项一;选项二",
             required: true,
-            selected: false
+            selected: false,
+            status: 3
         }
         questions.push(newQuestion)
         this.setState({questions})
@@ -462,7 +495,8 @@ export default class CreateTask extends Component {
             type: "image-uploader",
             choices: "1",
             required: true,
-            selected: false
+            selected: false,
+            status: 3
         }
         questions.push(newQuestion)
         this.setState({questions})
@@ -475,7 +509,8 @@ export default class CreateTask extends Component {
             type: "file-uploader",
             choices: "non",
             required: true,
-            selected: false
+            selected: false,
+            status: 3
         }
         questions.push(newQuestion)
         this.setState({questions})

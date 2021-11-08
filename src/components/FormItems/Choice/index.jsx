@@ -106,12 +106,12 @@ export class RadioCreate extends Component {
 export function RadioDisplay(props) {
     const { choices, choose } = props
     return (
-        <Radio.Group value={choose[0]?choose[0]:""}>
+        <Radio.Group value={choose.length?choose[0]:""}>
             <Space direction="vertical">
-                {choices.map(choice => (
-                    <Radio key={choice.id} value={choice.id}>
+                {choices.map((choice, idx) => (
+                    <Radio key={idx} value={idx}>
                         {choice.text}
-                        {choice.other && choose[0] === choice.id ? 
+                        {choice.other && choose[0] === idx ? 
                             <Input value={choice.value} />
                         :""}
                     </Radio>
@@ -228,9 +228,9 @@ export function CheckboxDisplay(props) {
         <Checkbox.Group value={choose}>
             <Space direction="vertical">
                 {choices.map((choice, idx) => (
-                    <Checkbox key={choice.id} value={choice.id}>
+                    <Checkbox key={idx} value={idx}>
                         {choice.text}
-                        {choice.other && choose.includes(choice.id) ?
+                        {choice.other && choose.includes(idx) ?
                             <Input style={{marginLeft: 25, marginTop: 10}} value={choice.value} />
                         : ""}
                     </Checkbox>

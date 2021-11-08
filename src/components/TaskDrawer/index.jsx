@@ -1,87 +1,54 @@
-import { Drawer } from 'antd'
+import { Drawer, message } from 'antd'
 import React, { Component } from 'react'
+import api from '../../api'
+import memoryUtils from '../../utils/memoryUtils'
+import storageUtils from '../../utils/storageUtils'
+import { combineQuestionAndAnswer } from '../../utils/tools'
 
 import QuestionDisplay from '../QuestionDisplay'
 
-const task = {
-    title: "测试任务",
-    description: "这是一个测试任务\n这是一个测试任务第二行",
-    id: "11111",
-    questions: [
-        {
-            id: 1,
-            order: 1,
-            task_id: "11111",
-            question: "这是一个单行输入框",
-            type: "text-input",
-            value: "abc",
-            choices: [],
-            choose: [],
-            required: true,
-        },
-        {
-            id: 2,
-            order: 2,
-            task_id: "11111",
-            question: "这是一个多行输入框",
-            type: "text-area",
-            value: "",
-            choices: [],
-            choose: [],
-            required: false,
-        },
-        {
-            id: 3,
-            order: 3,
-            task_id: "11111",
-            question: "这是一个日期输入框",
-            type: "date-input",
-            value: "",
-            choices: [],
-            choose: [],
-            required: false,
-        },
-        {
-            id: 4,
-            order: 4,
-            task_id: "11111",
-            question: "这是一个单项选择",
-            type: "radio",
-            value: "",
-            choices: [
-                {id: 1, question_id: 4, text: "选项一", other: false}, 
-                {id: 2, question_id: 4, text: "选项二", other: false}, 
-                {id: 3, question_id: 4, text: "其它", other: true, value: ""}
-            ],
-            choose: [],
-            required: true,
-        },
-        {
-            id: 5,
-            order: 5,
-            task_id: "11111",
-            question: "这是一个单项选择",
-            type: "checkbox",
-            value: "",
-            choices: [
-                {id: '1', question_id: 4, text: "选项一", other: false}, 
-                {id: '2', question_id: 4, text: "选项二", other: false}, 
-                {id: '3', question_id: 4, text: "其它", other: true, value: ""}
-            ],
-            choose: [],
-            required: true,
-        }
-    ]
-}
-
 export default class TaskDrawer extends Component {
     state = {
-        task: task
+        task: {
+            title: "",
+            description: ""
+        },
+        questions: []
+    }
+
+    async componentDidMount() {
+        let {taskId, create, answerId} = this.props
+        const result = await api.getTaskById(taskId*1)
+        if (result === "token") {
+            memoryUtils.isSignedIn = false
+            storageUtils.removeIsSignedIn()
+            message.info("登录授权已过期，请重新登录！")
+            this.props.history.push("/login")
+            return
+        } else if (!result) {
+            message.info("获取任务失败！")
+            return            
+        }
+
+        let {task, questions} = result
+
+        if (!create) {
+            const answer = await api.getAnswerById(answerId)
+            if (!answer) {
+                message.error("获取答案失败！")
+            } else {
+                questions = combineQuestionAndAnswer(questions, answer)
+            }
+        }
+        
+        this.setState({
+            task,
+            questions
+        })
     }
     render() {
         const { visible } = this.props
-        const { task } = this.state
-        const { questions } = task
+        const { task, questions } = this.state
         const header = (
             <div style={{ width:"100%", marginTop: 10}}>
                 <h1 style={{fontSize: 40,textAlign: "center",fontWeight: 400,fontFamily: "MyFont1"}}>{task.title}</h1>
