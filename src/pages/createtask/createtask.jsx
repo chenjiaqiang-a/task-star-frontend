@@ -32,19 +32,17 @@ import { Redirect } from 'react-router-dom'
 import api from '../../api'
 import storageUtils from '../../utils/storageUtils'
 
-const tempTask = {
-    title: "任务名称",
-    description: "任务描述",
-    private: false,
-    manySubmit: false,
-    creator: "",
-    status: 2,
-    id: nanoid(),
-}
-
 export default class CreateTask extends Component {
     state = {
-        task: tempTask,
+        task:  {
+            title: "任务名称",
+            description: "任务描述",
+            private: false,
+            manySubmit: false,
+            creator: "",
+            status: 2,
+            id: nanoid(),
+        },
         questions: [],
         deletedQuestion: [],
         visible: false,

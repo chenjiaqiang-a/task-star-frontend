@@ -14,6 +14,13 @@ export default class Editable extends Component {
             content: this.props.children
         })
     }
+    componentDidUpdate () {
+        if (this.state.content !== this.props.children) {
+            this.setState({
+                content: this.props.children
+            })
+        }
+    }
     render() {
         const {isEditing, content} = this.state
         const {textarea} = this.props
